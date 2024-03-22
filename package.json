@@ -1,0 +1,77 @@
+{
+  "name": "@valtown/codemirror-ts",
+  "version": "2.1.0",
+  "description": "codemirror extensions for typescript",
+  "main": "./dist/commonjs/index.js",
+  "scripts": {
+    "prepare": "tshy",
+    "dev": "vite",
+    "tsc": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "vite build"
+  },
+  "keywords": [
+    "codemirror",
+    "typescript",
+    "ts"
+  ],
+  "author": "Val Town",
+  "license": "ISC",
+  "peerDependencies": {
+    "@codemirror/autocomplete": "^6",
+    "@codemirror/lint": "^6",
+    "@codemirror/view": "^6"
+  },
+  "devDependencies": {
+    "@codemirror/lang-javascript": "^6.2.1",
+    "@typescript/vfs": "^1.5.0",
+    "codemirror": "^6",
+    "tshy": "^1.8.0",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.0",
+    "vitest": "^0.34.6"
+  },
+  "files": [
+    "dist"
+  ],
+  "tshy": {
+    "exports": {
+      "./package.json": "./package.json",
+      ".": "./src/index.ts",
+      "./worker": "./src/worker.ts"
+    }
+  },
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/index.d.ts",
+        "default": "./dist/commonjs/index.js"
+      }
+    },
+    "./worker": {
+      "import": {
+        "types": "./dist/esm/worker.d.ts",
+        "default": "./dist/esm/worker.js"
+      },
+      "require": {
+        "types": "./dist/commonjs/worker.d.ts",
+        "default": "./dist/commonjs/worker.js"
+      }
+    }
+  },
+  "types": "./dist/commonjs/index.d.ts",
+  "type": "module",
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "@connectrpc/connect": "^1.4.0",
+    "@connectrpc/connect-web": "^1.4.0"
+  }
+}
