@@ -4,7 +4,6 @@
   "description": "codemirror extensions for typescript",
   "main": "./dist/commonjs/index.js",
   "scripts": {
-    "prepare": "tshy",
     "dev": "vite",
     "tsc": "tsc --noEmit",
     "test": "vitest run",
@@ -27,7 +26,6 @@
     "@codemirror/lang-javascript": "^6.2.1",
     "@typescript/vfs": "^1.5.0",
     "codemirror": "^6",
-    "tshy": "^1.8.0",
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
     "vitest": "^0.34.6"
@@ -35,13 +33,6 @@
   "files": [
     "dist"
   ],
-  "tshy": {
-    "exports": {
-      "./package.json": "./package.json",
-      ".": "./src/index.ts",
-      "./worker": "./src/worker.ts"
-    }
-  },
   "exports": {
     "./package.json": "./package.json",
     ".": {
