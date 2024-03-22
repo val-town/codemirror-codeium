@@ -2,5 +2,5 @@
 export default {
   root: process.env.VITEST ? "." : "demo",
   outDir: "build",
-  base: "/codemirror-ts/",
+  base: "/codemirror-codeium/",
 };
