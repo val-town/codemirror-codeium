@@ -11,6 +11,8 @@
     "pages": "vite build",
     "build": "tsc --build"
   },
+  "main": "./dist/plugin.js",
+  "types": "./dist/plugin.d.ts",
   "keywords": [
     "codemirror",
     "typescript",
