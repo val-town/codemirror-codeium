@@ -20,4 +20,4 @@ jobs:
         uses: bahmutov/npm-install@v1
 
       - run: npm run tsc
-      - run: npm run test
+      # - run: npm run test

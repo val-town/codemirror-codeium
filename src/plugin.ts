@@ -147,7 +147,7 @@ function acceptSuggestionCommand(view: EditorView) {
   });
 
   let lastIndex = 0;
-  reverseReverseChangeSet?.iterChangedRanges((fromA, toA, fromB, toB) => {
+  reverseReverseChangeSet?.iterChangedRanges((_fromA, _toA, _fromB, toB) => {
     lastIndex = toB;
   });
 
