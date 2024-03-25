@@ -4,10 +4,12 @@
   "description": "codemirror integration for codeium",
   "scripts": {
     "dev": "vite",
+    "generate": "buf generate",
     "tsc": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "vite build"
+    "pages": "vite build",
+    "build": "tsc --build"
   },
   "keywords": [
     "codemirror",
@@ -22,6 +24,8 @@
     "@codemirror/view": "^6"
   },
   "devDependencies": {
+    "@bufbuild/buf": "^1.30.0",
+    "@bufbuild/protobuf": "^1.8.0",
     "@codemirror/lang-javascript": "^6.2.1",
     "@typescript/vfs": "^1.5.0",
     "codemirror": "^6",
