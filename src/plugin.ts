@@ -1,4 +1,3 @@
-import { indentUnit } from "@codemirror/language";
 import {
   Decoration,
   DecorationSet,
@@ -8,6 +7,7 @@ import {
 import {
   Annotation,
   EditorState,
+  EditorSelection,
   Extension,
   Prec,
   StateEffect,
@@ -16,7 +16,11 @@ import {
   ChangeSet,
 } from "@codemirror/state";
 import { completionStatus } from "@codemirror/autocomplete";
-import { getCodeiumCompletions } from "./codeium";
+import { getCodeiumCompletions } from "./codeium.js";
+
+// milliseconds before cancelling request
+// against codeium
+const TIMEOUT = 150;
 
 interface Suggestion {
   text: string;
@@ -134,19 +138,22 @@ function acceptSuggestionCommand(view: EditorView) {
     view.state.doc,
   );
 
-  // This is removing the previous ghost text and re-adding it.
+  // This is removing the previous ghost text. Don't
+  // add this to history.
   view.dispatch({
     changes: stateField.reverseChangeSet,
-    // selection: {anchor: actualTextEnd},
     effects: acceptSuggestion.of(null),
     annotations: [copilotEvent.of(null), Transaction.addToHistory.of(false)],
   });
 
-  // const tmpTextEnd = replacementEnd - (ghostTextEnd - ghostTextStart);
+  let lastIndex = 0;
+  reverseReverseChangeSet?.iterChangedRanges((fromA, toA, fromB, toB) => {
+    lastIndex = toB;
+  });
 
   view.dispatch({
     changes: reverseReverseChangeSet,
-    // selection: { anchor: actualTextEnd },
+    selection: EditorSelection.cursor(lastIndex),
     annotations: [copilotEvent.of(null), Transaction.addToHistory.of(true)],
   });
 
@@ -157,7 +164,8 @@ function rejectSuggestionCommand(view: EditorView) {
   // We delete the suggestion, then carry through with the original keypress
   const stateField = view.state.field(completionDecoration)!;
   const ghostTexts = stateField.ghostTexts;
-  if (!ghostTexts || !ghostTexts.length) {
+
+  if (!ghostTexts?.length) {
     return false;
   }
 
@@ -170,6 +178,7 @@ function rejectSuggestionCommand(view: EditorView) {
   return false;
 }
 
+// TODO: this isn't full reimplemented yet.
 function sameKeyCommand(view: EditorView, key: string) {
   // When we type a key that is the same as the first letter of the suggestion, we delete the first letter of the suggestion and carry through with the original keypress
   const ghostTexts = view.state.field(completionDecoration)!.ghostTexts;
@@ -185,8 +194,8 @@ function sameKeyCommand(view: EditorView, key: string) {
   }
 }
 
-const completionPlugin = () =>
-  EditorView.domEventHandlers({
+function completionPlugin() {
+  return EditorView.domEventHandlers({
     keydown(event, view) {
       if (
         event.key !== "Shift" &&
@@ -203,128 +212,142 @@ const completionPlugin = () =>
       return rejectSuggestionCommand(view);
     },
   });
+}
 
-const viewCompletionPlugin = () =>
-  EditorView.updateListener.of((update) => {
+function viewCompletionPlugin() {
+  return EditorView.updateListener.of((update) => {
     if (update.focusChanged) {
       rejectSuggestionCommand(update.view);
     }
   });
+}
 
-// A view plugin that requests completions from the server after a delay
+/**
+ * Don't request a completion if we've already
+ * done so, or it's a copilot event we're responding
+ * to, or if the view is not focused.
+ */
+function shouldIgnoreUpdate(update: ViewUpdate) {
+  // not focused
+  if (!update.view.hasFocus) return true;
+
+  // contains ghost text
+  if (update.state.field(completionDecoration).ghostTexts != null) return true;
+
+  // is autocompleting
+  if (completionStatus(update.state) === "active") return true;
+
+  // bad update
+  for (const tr of update.transactions) {
+    if (tr.annotation(copilotEvent) !== undefined) {
+      return true;
+    }
+  }
+}
+
+/**
+ * To request a completion, the document needs to have been
+ * updated and the update should not have been because
+ * of accepting or clearing a suggestion.
+ */
+function shouldRequestCompletion(update: ViewUpdate) {
+  return (
+    update.docChanged &&
+    !update.transactions.some((tr) =>
+      tr.effects.some((e) => e.is(acceptSuggestion) || e.is(clearSuggestion)),
+    )
+  );
+}
+
+/**
+ * A view plugin that requests completions from the server after a delay
+ */
 function completionRequester() {
   let timeout: any = null;
   let lastPos = 0;
 
-  const badUpdate = (update: ViewUpdate) => {
-    for (const tr of update.transactions) {
-      if (tr.annotation(copilotEvent) !== undefined) {
-        return true;
-      }
-    }
-    return false;
-  };
-  const containsGhostText = (update: ViewUpdate) => {
-    return update.state.field(completionDecoration).ghostTexts != null;
-  };
-  const autocompleting = (update: ViewUpdate) => {
-    return completionStatus(update.state) === "active";
-  };
-  const notFocused = (update: ViewUpdate) => {
-    return !update.view.hasFocus;
-  };
-
   return EditorView.updateListener.of((update: ViewUpdate) => {
-    if (
-      update.docChanged &&
-      !update.transactions.some((tr) =>
-        tr.effects.some((e) => e.is(acceptSuggestion) || e.is(clearSuggestion)),
-      )
-    ) {
-      // Cancel the previous timeout
-      if (timeout) {
-        clearTimeout(timeout);
-      }
-      if (
-        badUpdate(update) ||
-        containsGhostText(update) ||
-        autocompleting(update) ||
-        notFocused(update)
-      ) {
-        return;
-      }
+    if (!shouldRequestCompletion(update)) return;
 
-      // Get the current position and source
-      const state = update.state;
-      const pos = state.selection.main.head;
-      const source = state.doc.toString();
-
-      // Set a new timeout to request completion
-      timeout = setTimeout(async () => {
-        // Check if the position has changed
-        if (pos === lastPos) {
-          // Request completion from the server
-          try {
-            const completionResult = await getCodeiumCompletions({
-              text: source,
-              cursorOffset: pos,
-            });
-
-            if (!completionResult || completionResult.length === 0) {
-              return;
-            }
-
-            // Check if the position is still the same
-            if (
-              pos === lastPos &&
-              completionStatus(update.view.state) !== "active" &&
-              update.view.hasFocus
-            ) {
-              // Dispatch an effect to add the suggestion
-              // If the completion starts before the end of the line,
-              // check the end of the line with the end of the completion
-              const insertChangeSet = ChangeSet.of(
-                completionResult.map((part) => ({
-                  from: Number(part.offset),
-                  to: Number(part.offset),
-                  insert: part.text,
-                })),
-                state.doc.length,
-              );
-
-              const reverseChangeSet = insertChangeSet.invert(state.doc);
-
-              update.view.dispatch({
-                changes: insertChangeSet,
-                effects: addSuggestions.of({
-                  reverseChangeSet,
-                  suggestions: completionResult.map((part) => ({
-                    displayText: part.text,
-                    endReplacement: 0, // "",
-                    text: part.text,
-                    cursorPos: pos,
-                    startPos: Number(part.offset),
-                    endPos: Number(part.offset) + part.text.length,
-                  })),
-                }),
-                annotations: [
-                  copilotEvent.of(null),
-                  Transaction.addToHistory.of(false),
-                ],
-              });
-            }
-          } catch (error) {
-            console.warn("copilot completion failed", error);
-            // Javascript wait for 500ms for some reason is necessary here.
-            // TODO - FIGURE OUT WHY THIS RESOLVES THE BUG
-
-            await new Promise((resolve) => setTimeout(resolve, 300));
-          }
-        }
-      }, 150);
-      // Update the last position
-      lastPos = pos;
+    // Cancel the previous timeout
+    if (timeout) {
+      clearTimeout(timeout);
     }
+
+    if (shouldIgnoreUpdate(update)) {
+      return;
+    }
+
+    // Get the current position and source
+    const state = update.state;
+    const pos = state.selection.main.head;
+    const source = state.doc.toString();
+
+    // Set a new timeout to request completion
+    timeout = setTimeout(async () => {
+      // Check if the position has changed
+      if (pos !== lastPos) return;
+
+      // Request completion from the server
+      try {
+        const completionResult = await getCodeiumCompletions({
+          text: source,
+          cursorOffset: pos,
+        });
+
+        if (!completionResult || completionResult.length === 0) {
+          return;
+        }
+
+        // Check if the position is still the same
+        if (
+          pos === lastPos &&
+          completionStatus(update.view.state) !== "active" &&
+          update.view.hasFocus
+        ) {
+          // Dispatch an effect to add the suggestion
+          // If the completion starts before the end of the line,
+          // check the end of the line with the end of the completion
+          const insertChangeSet = ChangeSet.of(
+            completionResult.map((part) => ({
+              from: Number(part.offset),
+              to: Number(part.offset),
+              insert: part.text,
+            })),
+            state.doc.length,
+          );
+
+          const reverseChangeSet = insertChangeSet.invert(state.doc);
+
+          update.view.dispatch({
+            changes: insertChangeSet,
+            effects: addSuggestions.of({
+              reverseChangeSet,
+              suggestions: completionResult.map((part) => ({
+                displayText: part.text,
+                endReplacement: 0, // "",
+                text: part.text,
+                cursorPos: pos,
+                startPos: Number(part.offset),
+                endPos: Number(part.offset) + part.text.length,
+              })),
+            }),
+            annotations: [
+              copilotEvent.of(null),
+              Transaction.addToHistory.of(false),
+            ],
+          });
+        }
+      } catch (error) {
+        console.warn("copilot completion failed", error);
+        // Javascript wait for 500ms for some reason is necessary here.
+        // TODO - FIGURE OUT WHY THIS RESOLVES THE BUG
+
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+    }, TIMEOUT);
+    // Update the last position
+    lastPos = pos;
   });
 }
 

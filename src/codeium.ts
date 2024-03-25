@@ -1,7 +1,7 @@
 import { createPromiseClient } from "@connectrpc/connect";
-import { LanguageServerService } from "./api/proto/exa/language_server_pb/language_server_connect";
+import { LanguageServerService } from "./api/proto/exa/language_server_pb/language_server_connect.js";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb";
+import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
 
 // This is the same as the monaco editor example
 const EDITOR_API_KEY = "d49954eb-cfba-4992-980f-d8fb37f0e942";
@@ -52,7 +52,7 @@ export async function getCodeiumCompletions({
       headers: {
         Authorization: `Basic ${EDITOR_API_KEY}-${sessionId}`,
       },
-    }
+    },
   );
 
   const parts = completions.completionItems[0].completionParts

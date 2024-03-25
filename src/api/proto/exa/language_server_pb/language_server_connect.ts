@@ -5,7 +5,14 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AcceptCompletionRequest, AcceptCompletionResponse, GetAuthTokenRequest, GetAuthTokenResponse, GetCompletionsRequest, GetCompletionsResponse } from "./language_server_pb";
+import {
+  AcceptCompletionRequest,
+  AcceptCompletionResponse,
+  GetAuthTokenRequest,
+  GetAuthTokenResponse,
+  GetCompletionsRequest,
+  GetCompletionsResponse,
+} from "./language_server_pb";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -41,6 +48,5 @@ export const LanguageServerService = {
       O: GetAuthTokenResponse,
       kind: MethodKind.Unary,
     },
-  }
+  },
 } as const;
-
