@@ -1,5 +1,19 @@
 # codemirror-codeium
 
+```mermaid
+flowchart TD
+	Keystroke --> SetTimeout
+	Keystroke -->|ignoreUpdate| Cancelled
+	SetTimeout -->|edits| Cancelled
+	SetTimeout --> GetCompletions
+	GetCompletions -->|edits| Cancelled
+	X[ ] -->|focusChanged| Cancelled
+	GetCompletions --> DispatchEdits
+	DispatchEdits -->|mousedown| Cancelled
+	DispatchEdits --> SameKeyCommand
+	SameKeyCommand -->|tab| AcceptSuggestionCommand
+```
+
 _Very experimental and unofficial_
 
 Copilot-like ghost text code from [modeling-app](https://github.com/KittyCAD/modeling-app)
