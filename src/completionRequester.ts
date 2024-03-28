@@ -9,6 +9,7 @@ import {
 } from "./effects.js";
 import { completionDecoration } from "./completionDecoration.js";
 import { copilotEvent } from "./annotations.js";
+import { codeiumConfig } from "./config.js";
 
 // milliseconds before cancelling request
 // against codeium
@@ -59,6 +60,8 @@ export function completionRequester() {
   let lastPos = 0;
 
   return EditorView.updateListener.of((update: ViewUpdate) => {
+    const config = update.view.state.facet(codeiumConfig);
+
     if (!shouldRequestCompletion(update)) return;
 
     // Cancel the previous timeout
@@ -85,6 +88,7 @@ export function completionRequester() {
         const completionResult = await getCodeiumCompletions({
           text: source,
           cursorOffset: pos,
+          config,
         });
 
         if (!completionResult || completionResult.length === 0) {

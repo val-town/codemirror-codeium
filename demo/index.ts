@@ -17,7 +17,9 @@ increment('not a number');`,
         typescript: true,
         jsx: true,
       }),
-      copilotPlugin(),
+      copilotPlugin({
+        apiKey: "d49954eb-cfba-4992-980f-d8fb37f0e942",
+      }),
     ],
     parent: document.querySelector("#editor")!,
   });

@@ -3,10 +3,9 @@ import { LanguageServerService } from "./api/proto/exa/language_server_pb/langua
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
 import { GetCompletionsResponse } from "./api/proto/exa/language_server_pb/language_server_pb.js";
+import { CodeiumConfig } from "./config.js";
 
 // This is the same as the monaco editor example
-const EDITOR_API_KEY = "d49954eb-cfba-4992-980f-d8fb37f0e942";
-
 const transport = createConnectTransport({
   baseUrl: "https://web-backend.codeium.com",
   useBinaryFormat: true,
@@ -19,9 +18,11 @@ const sessionId = crypto.randomUUID();
 export async function getCodeiumCompletions({
   text,
   cursorOffset,
+  config,
 }: {
   text: string;
   cursorOffset: number;
+  config: CodeiumConfig;
 }) {
   const completions = (await client.getCompletions(
     {
@@ -30,7 +31,7 @@ export async function getCodeiumCompletions({
         ideVersion: "unknown",
         extensionName: "@valtown/codemirror-codeium",
         extensionVersion: "unknown",
-        apiKey: EDITOR_API_KEY,
+        apiKey: config.apiKey,
         sessionId: sessionId,
       },
       document: {
@@ -38,7 +39,7 @@ export async function getCodeiumCompletions({
         cursorOffset: BigInt(cursorOffset),
         language: Language.TYPESCRIPT,
         // The types don't like this here, but it works.
-        editorLanguage: "typescript", // Language.TYPESCRIPT as unknown as string,
+        editorLanguage: "typescript",
         lineEnding: "\n",
       },
       editorOptions: {
@@ -51,7 +52,7 @@ export async function getCodeiumCompletions({
     {
       // signal,
       headers: {
-        Authorization: `Basic ${EDITOR_API_KEY}-${sessionId}`,
+        Authorization: `Basic ${config.apiKey}-${sessionId}`,
       },
     },
     // TODO: why doesn't this work by default?

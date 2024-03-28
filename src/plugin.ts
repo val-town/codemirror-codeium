@@ -3,6 +3,7 @@ import { Extension, Prec } from "@codemirror/state";
 import { completionDecoration } from "./completionDecoration.js";
 import { completionRequester } from "./completionRequester.js";
 import { sameKeyCommand, rejectSuggestionCommand } from "./commands.js";
+import { CodeiumConfig, codeiumConfig } from "./config.js";
 
 function completionPlugin() {
   return EditorView.domEventHandlers({
@@ -32,8 +33,9 @@ function viewCompletionPlugin() {
   });
 }
 
-export function copilotPlugin(): Extension {
+export function copilotPlugin(config: CodeiumConfig): Extension {
   return [
+    codeiumConfig.of(config),
     completionDecoration,
     Prec.highest(completionPlugin()),
     Prec.highest(viewCompletionPlugin()),
