@@ -13,8 +13,7 @@ import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js
 function isDecorationClicked(view: EditorView) {
   let inRange = false;
   const head = view.state.selection.asSingle().ranges.at(0)?.head;
-  if (head) {
-    console.log(head);
+  if (head !== undefined) {
     view.state
       .field(completionDecoration)
       .decorations?.between(head, head, () => {
