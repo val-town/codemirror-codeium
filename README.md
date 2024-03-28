@@ -25,7 +25,7 @@ See the [demo source code](https://github.com/val-town/codemirror-codeium/tree/m
 a reference to how it's used.
 
 ```ts
-import { copilotPlugin } from "@val-town/codemirror-codeium";
+import { copilotPlugin } from "@valtown/codemirror-codeium";
 
 // This is a CodeMirror extension
 copilotPlugin();
@@ -48,3 +48,12 @@ text. You can add your own style for this class. The demo uses this style:
   background: #eee;
 }
 ```
+
+### Architecture
+
+This makes requests against the [Codeium](https://codeium.com/) hosted product,
+using their Protocol Buffer-based interface. That's what the `buf` and `connectrpc`
+modules are doing - generating and using bindings to their service.
+
+The extension is a composite of facets, decorations, state fields, and more
+that are encapsulated.
