@@ -28,7 +28,7 @@ export async function getCodeiumCompletions({
       metadata: {
         ideName: "web",
         ideVersion: "unknown",
-        extensionName: "@val-town/unofficial",
+        extensionName: "@valtown/codemirror-codeium",
         extensionVersion: "unknown",
         apiKey: EDITOR_API_KEY,
         sessionId: sessionId,
