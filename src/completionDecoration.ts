@@ -16,8 +16,6 @@ export const completionDecoration = StateField.define<CompletionState>({
   update(state: CompletionState, transaction: Transaction) {
     for (const effect of transaction.effects) {
       if (effect.is(addSuggestions)) {
-        // When adding a suggestion, we set th ghostText
-
         // NOTE: here we're adjusting the decoration range
         // to refer to locations in the document _after_ we've
         // inserted the text.

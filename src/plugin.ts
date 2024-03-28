@@ -2,9 +2,27 @@ import { EditorView } from "@codemirror/view";
 import { Extension, Prec } from "@codemirror/state";
 import { completionDecoration } from "./completionDecoration.js";
 import { completionRequester } from "./completionRequester.js";
-import { sameKeyCommand, rejectSuggestionCommand } from "./commands.js";
+import {
+  sameKeyCommand,
+  rejectSuggestionCommand,
+  acceptSuggestionCommand,
+} from "./commands.js";
 import { CodeiumConfig, codeiumConfig } from "./config.js";
 import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
+
+function isDecorationClicked(view: EditorView) {
+  let inRange = false;
+  const head = view.state.selection.asSingle().ranges.at(0)?.head;
+  if (head !== undefined) {
+    view.state
+      .field(completionDecoration)
+      .decorations?.between(head, head, () => {
+        inRange = true;
+      });
+    return inRange;
+  }
+  return false;
+}
 
 function completionPlugin() {
   return EditorView.domEventHandlers({
@@ -20,8 +38,12 @@ function completionPlugin() {
         return false;
       }
     },
-    mousedown(_event, view) {
-      return rejectSuggestionCommand(view);
+    mouseup(_event, view) {
+      if (isDecorationClicked(view)) {
+        return acceptSuggestionCommand(view);
+      } else {
+        return rejectSuggestionCommand(view);
+      }
     },
   });
 }
