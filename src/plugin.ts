@@ -4,6 +4,7 @@ import { completionDecoration } from "./completionDecoration.js";
 import { completionRequester } from "./completionRequester.js";
 import { sameKeyCommand, rejectSuggestionCommand } from "./commands.js";
 import { CodeiumConfig, codeiumConfig } from "./config.js";
+import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
 
 function completionPlugin() {
   return EditorView.domEventHandlers({
@@ -32,6 +33,8 @@ function viewCompletionPlugin() {
     }
   });
 }
+
+export { Language };
 
 export function copilotPlugin(config: CodeiumConfig): Extension {
   return [

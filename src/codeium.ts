@@ -1,7 +1,6 @@
 import { createPromiseClient } from "@connectrpc/connect";
 import { LanguageServerService } from "./api/proto/exa/language_server_pb/language_server_connect.js";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
 import { GetCompletionsResponse } from "./api/proto/exa/language_server_pb/language_server_pb.js";
 import { CodeiumConfig } from "./config.js";
 
@@ -37,7 +36,9 @@ export async function getCodeiumCompletions({
       document: {
         text: text,
         cursorOffset: BigInt(cursorOffset),
-        language: Language.TYPESCRIPT,
+        language: config.language,
+        // TODO: not sure why we have both language and
+        // editorlanguage
         // The types don't like this here, but it works.
         editorLanguage: "typescript",
         lineEnding: "\n",
