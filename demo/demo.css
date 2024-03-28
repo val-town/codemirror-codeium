@@ -46,7 +46,11 @@ main {
 
 .cm-ghostText,
 .cm-ghostText * {
-  /* color: rgb(120, 120, 120, 0.8) !important; */
   opacity: 0.6;
   filter: grayscale(20%);
+  cursor: pointer;
+}
+
+.cm-ghostText:hover {
+  background: #eee;
 }

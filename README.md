@@ -30,3 +30,21 @@ import { copilotPlugin } from "@val-town/codemirror-codeium";
 // This is a CodeMirror extension
 copilotPlugin();
 ```
+
+### CSS
+
+This adds a `.ghostText` class to CodeMirror decorations for the AI-written
+text. You can add your own style for this class. The demo uses this style:
+
+```css
+.cm-ghostText,
+.cm-ghostText * {
+  opacity: 0.6;
+  filter: grayscale(20%);
+  cursor: pointer;
+}
+
+.cm-ghostText:hover {
+  background: #eee;
+}
+```
