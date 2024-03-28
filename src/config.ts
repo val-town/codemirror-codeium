@@ -2,8 +2,16 @@ import { Facet, combineConfig } from "@codemirror/state";
 import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
 
 export interface CodeiumConfig {
+  /**
+   * Codeium API key
+   */
   apiKey: string;
   language?: Language;
+  /**
+   * Time in millseconds after typing to fetch
+   * completions from codeium
+   */
+  timeout?: number;
 }
 
 export const codeiumConfig = Facet.define<
@@ -15,6 +23,7 @@ export const codeiumConfig = Facet.define<
       configs,
       {
         language: Language.TYPESCRIPT,
+        timeout: 150,
       },
       {},
     );

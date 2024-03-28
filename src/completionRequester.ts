@@ -1,7 +1,11 @@
 import { completionStatus } from "@codemirror/autocomplete";
 import { ChangeSet, Transaction } from "@codemirror/state";
 import { EditorView, ViewUpdate } from "@codemirror/view";
-import { getCodeiumCompletions } from "./codeium.js";
+import {
+  simplifyCompletions,
+  completionsToChangeSpec,
+  getCodeiumCompletions,
+} from "./codeium.js";
 import {
   acceptSuggestion,
   addSuggestions,
@@ -10,10 +14,6 @@ import {
 import { completionDecoration } from "./completionDecoration.js";
 import { copilotEvent } from "./annotations.js";
 import { codeiumConfig } from "./config.js";
-
-// milliseconds before cancelling request
-// against codeium
-const TIMEOUT = 150;
 
 /**
  * To request a completion, the document needs to have been
@@ -91,7 +91,10 @@ export function completionRequester() {
           config,
         });
 
-        if (!completionResult || completionResult.length === 0) {
+        if (
+          !completionResult ||
+          completionResult.completionItems.length === 0
+        ) {
           return;
         }
 
@@ -112,11 +115,7 @@ export function completionRequester() {
         // If the completion starts before the end of the line,
         // check the end of the line with the end of the completion
         const insertChangeSet = ChangeSet.of(
-          completionResult.map((part) => ({
-            from: Number(part.offset),
-            to: Number(part.offset),
-            insert: part.text,
-          })),
+          completionsToChangeSpec(completionResult),
           state.doc.length,
         );
 
@@ -126,7 +125,7 @@ export function completionRequester() {
           changes: insertChangeSet,
           effects: addSuggestions.of({
             reverseChangeSet,
-            suggestions: completionResult.map((part) => ({
+            suggestions: simplifyCompletions(completionResult).map((part) => ({
               displayText: part.text,
               endReplacement: 0, // "",
               text: part.text,
@@ -147,7 +146,7 @@ export function completionRequester() {
 
         await new Promise((resolve) => setTimeout(resolve, 300));
       }
-    }, TIMEOUT);
+    }, config.timeout);
     // Update the last position
     lastPos = pos;
   });

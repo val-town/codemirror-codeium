@@ -3,6 +3,7 @@ import { LanguageServerService } from "./api/proto/exa/language_server_pb/langua
 import { createConnectTransport } from "@connectrpc/connect-web";
 import { GetCompletionsResponse } from "./api/proto/exa/language_server_pb/language_server_pb.js";
 import { CodeiumConfig } from "./config.js";
+import { ChangeSpec } from "@codemirror/state";
 
 // This is the same as the monaco editor example
 const transport = createConnectTransport({
@@ -23,7 +24,7 @@ export async function getCodeiumCompletions({
   cursorOffset: number;
   config: CodeiumConfig;
 }) {
-  const completions = (await client.getCompletions(
+  return (await client.getCompletions(
     {
       metadata: {
         ideName: "web",
@@ -58,20 +59,28 @@ export async function getCodeiumCompletions({
     },
     // TODO: why doesn't this work by default?
   )) as GetCompletionsResponse;
+}
 
-  const parts = completions.completionItems[0]!.completionParts.filter(
-    (part) => {
-      // Type 3 overwrites existing text. Maybe we need this eventually,
-      // but not right now and it usually is duplicative.
-      return part.type !== 3;
-    },
-  ).map((part) => {
+export function simplifyCompletions(completions: GetCompletionsResponse) {
+  return completions.completionItems[0]!.completionParts.filter((part) => {
+    // Type 3 overwrites existing text. Maybe we need this eventually,
+    // but not right now and it usually is duplicative.
+    return part.type !== 3;
+  }).map((part) => {
     return {
       ...part,
       offset: Number(part.offset),
       text: part.type === 2 ? `\n${part.text}` : part.text,
     };
   });
+}
 
-  return parts;
+export function completionsToChangeSpec(
+  completions: GetCompletionsResponse,
+): ChangeSpec[] {
+  return simplifyCompletions(completions).map((part) => ({
+    from: Number(part.offset),
+    to: Number(part.offset),
+    insert: part.text,
+  }));
 }
