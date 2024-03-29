@@ -10,4 +10,3 @@ plugins:
     out: src/api/proto
     opt:
       - target=ts
-      - import_extension=none
