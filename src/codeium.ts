@@ -30,7 +30,7 @@ export async function getCodeiumCompletions({
         ideName: "web",
         ideVersion: "0.0.5",
         extensionName: "@valtown/codemirror-codeium",
-        extensionVersion: "unknown",
+        extensionVersion: "1.0.0",
         apiKey: config.apiKey,
         sessionId: sessionId,
         authSource: config.authSource,
