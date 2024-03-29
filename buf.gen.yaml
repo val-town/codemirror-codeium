@@ -6,7 +6,6 @@ plugins:
     out: src/api/proto
     opt:
       - target=ts
-      - import_extension=none
   - plugin: buf.build/connectrpc/es:v1.1.3
     out: src/api/proto
     opt:
