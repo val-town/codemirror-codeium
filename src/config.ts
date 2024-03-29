@@ -12,6 +12,8 @@ export interface CodeiumConfig {
    * completions from codeium
    */
   timeout?: number;
+
+  authSource?: number;
 }
 
 export const codeiumConfig = Facet.define<

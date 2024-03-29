@@ -33,6 +33,7 @@ export async function getCodeiumCompletions({
         extensionVersion: "unknown",
         apiKey: config.apiKey,
         sessionId: sessionId,
+        authSource: config.authSource,
       },
       document: {
         text: text,
