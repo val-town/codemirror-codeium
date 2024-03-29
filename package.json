@@ -9,7 +9,8 @@
     "test": "echo pass",
     "test:watch": "vitest",
     "pages": "vite build",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "prepare": "npm run build"
   },
   "main": "./dist/plugin.js",
   "types": "./dist/plugin.d.ts",
