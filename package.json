@@ -29,11 +29,11 @@
   "devDependencies": {
     "@bufbuild/buf": "^1.30.0",
     "@bufbuild/protobuf": "^1.8.0",
-    "@codemirror/lang-python": "^6.1.4",
-    "@codemirror/lang-javascript": "^6.2.1",
+    "@codemirror/lang-python": "^6.1.5",
+    "@codemirror/lang-javascript": "^6.2.2",
     "codemirror": "^6",
-    "typescript": "^5.2.2",
-    "vite": "^4.5.0"
+    "typescript": "^5.4.3",
+    "vite": "^5.2.7"
   },
   "files": [
     "dist"
