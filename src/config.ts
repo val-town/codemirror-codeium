@@ -1,5 +1,7 @@
 import { Facet, combineConfig } from "@codemirror/state";
 import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
+import { Document } from "./api/proto/exa/language_server_pb/language_server_pb.js";
+import { type PartialMessage } from "@bufbuild/protobuf";
 
 export interface CodeiumConfig {
   /**
@@ -14,6 +16,8 @@ export interface CodeiumConfig {
   timeout?: number;
 
   authSource?: number;
+
+  otherDocuments?: PartialMessage<Document>[];
 }
 
 export const codeiumConfig = Facet.define<
@@ -26,6 +30,7 @@ export const codeiumConfig = Facet.define<
       {
         language: Language.TYPESCRIPT,
         timeout: 150,
+        otherDocuments: [],
       },
       {},
     );

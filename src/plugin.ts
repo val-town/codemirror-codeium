@@ -1,4 +1,4 @@
-import { EditorView } from "@codemirror/view";
+import { EditorView, ViewUpdate } from "@codemirror/view";
 import { Extension, Prec } from "@codemirror/state";
 import { completionDecoration } from "./completionDecoration.js";
 import { completionRequester } from "./completionRequester.js";
@@ -9,6 +9,7 @@ import {
 } from "./commands.js";
 import { CodeiumConfig, codeiumConfig } from "./config.js";
 import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
+import { copilotIgnore } from "./annotations.js";
 
 function isDecorationClicked(view: EditorView) {
   let inRange = false;
@@ -66,4 +67,19 @@ export function copilotPlugin(config: CodeiumConfig): Extension {
     Prec.highest(viewCompletionPlugin()),
     completionRequester(),
   ];
+}
+
+/**
+ * Returns false if this ViewUpdate is just the plugin
+ * adding or removing ghost text, and it should not be
+ * considered when saving this CodeMirror state into other
+ * systems, like draft recovery.
+ */
+export function shouldTakeUpdate(update: ViewUpdate) {
+  for (const tr of update.transactions) {
+    if (tr.annotation(copilotIgnore) !== undefined) {
+      return false;
+    }
+  }
+  return true;
 }
