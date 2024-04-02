@@ -57,7 +57,7 @@ function viewCompletionPlugin() {
   });
 }
 
-export { Language };
+export { Language, copilotIgnore };
 
 export function copilotPlugin(config: CodeiumConfig): Extension {
   return [
