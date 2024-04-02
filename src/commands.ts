@@ -1,6 +1,6 @@
 import { Transaction, EditorSelection } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import { copilotEvent } from "./annotations.js";
+import { copilotEvent, copilotIgnore } from "./annotations.js";
 import { completionDecoration } from "./completionDecoration.js";
 import { acceptSuggestion, clearSuggestion } from "./effects.js";
 
@@ -18,12 +18,20 @@ export function acceptSuggestionCommand(view: EditorView) {
     view.state.doc,
   );
 
-  // This is removing the previous ghost text. Don't
-  // add this to history.
+  // This is removing the previous ghost text.
   view.dispatch({
     changes: stateField.reverseChangeSet,
     effects: acceptSuggestion.of(null),
-    annotations: [copilotEvent.of(null), Transaction.addToHistory.of(false)],
+    annotations: [
+      // Tell upstream integrations to ignore this
+      // change.
+      copilotIgnore.of(null),
+      // Tell ourselves not to request a completion
+      // because of this change.
+      copilotEvent.of(null),
+      // Don't add this to history.
+      Transaction.addToHistory.of(false),
+    ],
   });
 
   let lastIndex = 0;
@@ -52,7 +60,14 @@ export function rejectSuggestionCommand(view: EditorView) {
   view.dispatch({
     changes: stateField.reverseChangeSet,
     effects: clearSuggestion.of(null),
-    annotations: [copilotEvent.of(null), Transaction.addToHistory.of(false)],
+    annotations: [
+      // Tell upstream integrations to ignore this
+      // change. This was never really in the document
+      // in the first place - we were just showing ghost text.
+      copilotIgnore.of(null),
+      copilotEvent.of(null),
+      Transaction.addToHistory.of(false),
+    ],
   });
 
   return false;

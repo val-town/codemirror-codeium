@@ -19,6 +19,14 @@ increment('not a number');`,
     }),
     copilotPlugin({
       apiKey: "d49954eb-cfba-4992-980f-d8fb37f0e942",
+      otherDocuments: [
+        {
+          absolutePath: "https://esm.town/v/foo.ts",
+          text: "export const foo = 10;",
+          language: Language.TYPESCRIPT,
+          editorLanguage: "typescript",
+        },
+      ],
     }),
   ],
   parent: document.querySelector("#editor")!,

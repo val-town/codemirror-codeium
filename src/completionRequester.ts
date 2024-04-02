@@ -12,7 +12,7 @@ import {
   clearSuggestion,
 } from "./effects.js";
 import { completionDecoration } from "./completionDecoration.js";
-import { copilotEvent } from "./annotations.js";
+import { copilotEvent, copilotIgnore } from "./annotations.js";
 import { codeiumConfig } from "./config.js";
 
 /**
@@ -135,6 +135,7 @@ export function completionRequester() {
             })),
           }),
           annotations: [
+            copilotIgnore.of(null),
             copilotEvent.of(null),
             Transaction.addToHistory.of(false),
           ],

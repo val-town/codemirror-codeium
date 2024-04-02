@@ -49,7 +49,7 @@ export async function getCodeiumCompletions({
         tabSize: 2n,
         insertSpaces: true,
       },
-      otherDocuments: [],
+      otherDocuments: config.otherDocuments,
       multilineConfig: undefined,
     },
     {
