@@ -21,7 +21,6 @@ export const completionDecoration = StateField.define<CompletionState>({
         // inserted the text.
         const decorations = Decoration.set(
           effect.value.suggestions.map((suggestion) => {
-            console.log(suggestion.startPos, suggestion.endPos);
             let range = ghostMark.range(suggestion.startPos, suggestion.endPos);
             return range;
           }),
