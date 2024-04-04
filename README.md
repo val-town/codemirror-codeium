@@ -1,5 +1,7 @@
 # codemirror-codeium
 
+ [![npm](https://img.shields.io/npm/v/@valtown/codemirror-codeium)](https://www.npmjs.com/package/@valtown/codemirror-codeium)
+
 ```mermaid
 flowchart TD
 	Keystroke --> SetTimeout
