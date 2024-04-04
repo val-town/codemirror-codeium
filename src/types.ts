@@ -10,11 +10,10 @@ export interface Suggestion {
   endReplacement: number;
 }
 
-export interface CompletionState {
-  ghostTexts: GhostText[] | null;
-  reverseChangeSet?: ChangeSet;
-  decorations?: DecorationSet;
-}
+export type CompletionState = null | {
+  reverseChangeSet: ChangeSet;
+  decorations: DecorationSet;
+};
 
 export interface GhostText {
   text: string;

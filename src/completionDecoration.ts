@@ -11,7 +11,7 @@ const ghostMark = Decoration.mark({ class: "cm-ghostText" });
 
 export const completionDecoration = StateField.define<CompletionState>({
   create(_state: EditorState) {
-    return { ghostTexts: null };
+    return null;
   },
   update(state: CompletionState, transaction: Transaction) {
     for (const effect of transaction.effects) {
@@ -19,16 +19,10 @@ export const completionDecoration = StateField.define<CompletionState>({
         // NOTE: here we're adjusting the decoration range
         // to refer to locations in the document _after_ we've
         // inserted the text.
-        let decorationOffset = 0;
         const decorations = Decoration.set(
           effect.value.suggestions.map((suggestion) => {
-            const endGhostText =
-              suggestion.startPos + suggestion.displayText.length;
-            let range = ghostMark.range(
-              decorationOffset + suggestion.startPos,
-              decorationOffset + endGhostText,
-            );
-            decorationOffset += suggestion.displayText.length;
+            console.log(suggestion.startPos, suggestion.endPos);
+            let range = ghostMark.range(suggestion.startPos, suggestion.endPos);
             return range;
           }),
         );
@@ -37,29 +31,11 @@ export const completionDecoration = StateField.define<CompletionState>({
         return {
           decorations,
           reverseChangeSet: effect.value.reverseChangeSet,
-          ghostTexts: effect.value.suggestions.map((suggestion) => {
-            const endGhostText =
-              suggestion.cursorPos + suggestion.displayText.length;
-            return {
-              text: suggestion.text,
-              displayText: suggestion.text,
-              startPos: suggestion.startPos,
-              endPos: suggestion.endPos,
-              decorations,
-              // TODO: what's the difference between this
-              // and startPos?
-              displayPos: suggestion.cursorPos,
-              endReplacement: suggestion.endReplacement,
-              endGhostText,
-            };
-          }),
         };
       } else if (effect.is(acceptSuggestion)) {
-        if (state.ghostTexts) {
-          return { ghostTexts: null };
-        }
+        return null;
       } else if (effect.is(clearSuggestion)) {
-        return { ghostTexts: null };
+        return null;
       }
     }
 
@@ -67,6 +43,6 @@ export const completionDecoration = StateField.define<CompletionState>({
   },
   provide: (field) =>
     EditorView.decorations.from(field, (value) => {
-      return value.decorations || Decoration.none;
+      return value?.decorations || Decoration.none;
     }),
 });

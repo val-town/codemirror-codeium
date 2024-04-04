@@ -8,9 +8,8 @@ export function acceptSuggestionCommand(view: EditorView) {
   // We delete the ghost text and insert the suggestion.
   // We also set the cursor to the end of the suggestion.
   const stateField = view.state.field(completionDecoration)!;
-  const ghostTexts = stateField.ghostTexts;
 
-  if (!ghostTexts) {
+  if (!stateField) {
     return false;
   }
 
@@ -51,9 +50,8 @@ export function acceptSuggestionCommand(view: EditorView) {
 export function rejectSuggestionCommand(view: EditorView) {
   // We delete the suggestion, then carry through with the original keypress
   const stateField = view.state.field(completionDecoration)!;
-  const ghostTexts = stateField.ghostTexts;
 
-  if (!ghostTexts?.length) {
+  if (!stateField) {
     return false;
   }
 
@@ -76,9 +74,9 @@ export function rejectSuggestionCommand(view: EditorView) {
 // TODO: this isn't full reimplemented yet.
 export function sameKeyCommand(view: EditorView, key: string) {
   // When we type a key that is the same as the first letter of the suggestion, we delete the first letter of the suggestion and carry through with the original keypress
-  const ghostTexts = view.state.field(completionDecoration)!.ghostTexts;
+  const stateField = view.state.field(completionDecoration);
 
-  if (!ghostTexts || !ghostTexts.length) {
+  if (!stateField) {
     return false;
   }
 
