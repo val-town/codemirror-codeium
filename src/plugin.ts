@@ -14,12 +14,11 @@ import { copilotIgnore } from "./annotations.js";
 function isDecorationClicked(view: EditorView) {
   let inRange = false;
   const head = view.state.selection.asSingle().ranges.at(0)?.head;
-  if (head !== undefined) {
-    view.state
-      .field(completionDecoration)
-      .decorations?.between(head, head, () => {
-        inRange = true;
-      });
+  const stateField = view.state.field(completionDecoration);
+  if (head !== undefined && stateField) {
+    stateField.decorations?.between(head, head, () => {
+      inRange = true;
+    });
     return inRange;
   }
   return false;

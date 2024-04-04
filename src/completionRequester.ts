@@ -39,7 +39,7 @@ function shouldIgnoreUpdate(update: ViewUpdate) {
   if (!update.view.hasFocus) return true;
 
   // contains ghost text
-  if (update.state.field(completionDecoration).ghostTexts != null) return true;
+  if (update.state.field(completionDecoration)) return true;
 
   // is autocompleting
   if (completionStatus(update.state) === "active") return true;
@@ -121,18 +121,26 @@ export function completionRequester() {
 
         const reverseChangeSet = insertChangeSet.invert(state.doc);
 
+        let combinedOffset = 0;
         update.view.dispatch({
           changes: insertChangeSet,
           effects: addSuggestions.of({
             reverseChangeSet,
-            suggestions: simplifyCompletions(completionResult).map((part) => ({
-              displayText: part.text,
-              endReplacement: 0, // "",
-              text: part.text,
-              cursorPos: pos,
-              startPos: Number(part.offset),
-              endPos: Number(part.offset) + part.text.length,
-            })),
+            suggestions: simplifyCompletions(completionResult).map((part) => {
+              try {
+                return {
+                  displayText: part.text,
+                  endReplacement: 0, // "",
+                  text: part.text,
+                  cursorPos: pos,
+                  startPos: combinedOffset + Number(part.offset),
+                  endPos:
+                    combinedOffset + Number(part.offset) + part.text.length,
+                };
+              } finally {
+                combinedOffset += part.text.length;
+              }
+            }),
           }),
           annotations: [
             copilotIgnore.of(null),
