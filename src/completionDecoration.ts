@@ -23,9 +23,9 @@ export const completionDecoration = StateField.define<CompletionState>({
         const decorations = Decoration.set(
           effect.value.suggestions.map((suggestion) => {
             const endGhostText =
-              suggestion.cursorPos + suggestion.displayText.length;
+              suggestion.startPos + suggestion.displayText.length;
             let range = ghostMark.range(
-              decorationOffset + suggestion.cursorPos,
+              decorationOffset + suggestion.startPos,
               decorationOffset + endGhostText,
             );
             decorationOffset += suggestion.displayText.length;
