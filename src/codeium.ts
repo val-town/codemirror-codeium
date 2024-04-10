@@ -1,9 +1,13 @@
 import { createPromiseClient } from "@connectrpc/connect";
 import { LanguageServerService } from "./api/proto/exa/language_server_pb/language_server_connect.js";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import { GetCompletionsResponse } from "./api/proto/exa/language_server_pb/language_server_pb.js";
+import {
+  Document,
+  GetCompletionsResponse,
+} from "./api/proto/exa/language_server_pb/language_server_pb.js";
 import { CodeiumConfig } from "./config.js";
 import { ChangeSpec } from "@codemirror/state";
+import { type PartialMessage } from "@bufbuild/protobuf";
 
 // This is the same as the monaco editor example
 const transport = createConnectTransport({
@@ -19,10 +23,12 @@ export async function getCodeiumCompletions({
   text,
   cursorOffset,
   config,
+  otherDocuments,
 }: {
   text: string;
   cursorOffset: number;
   config: CodeiumConfig;
+  otherDocuments: PartialMessage<Document>[];
 }) {
   return (await client.getCompletions(
     {
@@ -49,7 +55,7 @@ export async function getCodeiumCompletions({
         tabSize: 2n,
         insertSpaces: true,
       },
-      otherDocuments: config.otherDocuments,
+      otherDocuments: otherDocuments,
       multilineConfig: undefined,
     },
     {

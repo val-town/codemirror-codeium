@@ -1,6 +1,10 @@
 import { EditorView, basicSetup } from "codemirror";
 import { javascript } from "@codemirror/lang-javascript";
-import { Language, copilotPlugin } from "../src/plugin.js";
+import {
+  codeiumOtherDocumentsConfig,
+  Language,
+  copilotPlugin,
+} from "../src/plugin.js";
 import { python } from "@codemirror/lang-python";
 
 new EditorView({
@@ -17,16 +21,20 @@ increment('not a number');`,
       typescript: true,
       jsx: true,
     }),
-    copilotPlugin({
-      apiKey: "d49954eb-cfba-4992-980f-d8fb37f0e942",
+    codeiumOtherDocumentsConfig.of({
       otherDocuments: [
         {
           absolutePath: "https://esm.town/v/foo.ts",
-          text: "export const foo = 10;",
+          text: `export const foo = 10;
+
+const hiddenValue = "https://macwright.com/"`,
           language: Language.TYPESCRIPT,
           editorLanguage: "typescript",
         },
       ],
+    }),
+    copilotPlugin({
+      apiKey: "d49954eb-cfba-4992-980f-d8fb37f0e942",
     }),
   ],
   parent: document.querySelector("#editor")!,
