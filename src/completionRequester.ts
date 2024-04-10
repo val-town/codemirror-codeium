@@ -13,7 +13,7 @@ import {
 } from "./effects.js";
 import { completionDecoration } from "./completionDecoration.js";
 import { copilotEvent, copilotIgnore } from "./annotations.js";
-import { codeiumConfig } from "./config.js";
+import { codeiumConfig, codeiumOtherDocumentsConfig } from "./config.js";
 
 /**
  * To request a completion, the document needs to have been
@@ -61,6 +61,9 @@ export function completionRequester() {
 
   return EditorView.updateListener.of((update: ViewUpdate) => {
     const config = update.view.state.facet(codeiumConfig);
+    const { otherDocuments } = update.view.state.facet(
+      codeiumOtherDocumentsConfig,
+    );
 
     if (!shouldRequestCompletion(update)) return;
 
@@ -89,6 +92,7 @@ export function completionRequester() {
           text: source,
           cursorOffset: pos,
           config,
+          otherDocuments,
         });
 
         if (
@@ -129,8 +133,6 @@ export function completionRequester() {
             suggestions: simplifyCompletions(completionResult).map((part) => {
               try {
                 return {
-                  displayText: part.text,
-                  endReplacement: 0, // "",
                   text: part.text,
                   cursorPos: pos,
                   startPos: combinedOffset + Number(part.offset),

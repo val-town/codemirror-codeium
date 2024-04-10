@@ -16,8 +16,6 @@ export interface CodeiumConfig {
   timeout?: number;
 
   authSource?: number;
-
-  otherDocuments?: PartialMessage<Document>[];
 }
 
 export const codeiumConfig = Facet.define<
@@ -30,6 +28,24 @@ export const codeiumConfig = Facet.define<
       {
         language: Language.TYPESCRIPT,
         timeout: 150,
+      },
+      {},
+    );
+  },
+});
+
+export interface CodeiumOtherDocumentsConfig {
+  otherDocuments?: PartialMessage<Document>[];
+}
+
+export const codeiumOtherDocumentsConfig = Facet.define<
+  CodeiumOtherDocumentsConfig,
+  Required<CodeiumOtherDocumentsConfig>
+>({
+  combine(configs) {
+    return combineConfig<Required<CodeiumOtherDocumentsConfig>>(
+      configs,
+      {
         otherDocuments: [],
       },
       {},

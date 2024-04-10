@@ -7,7 +7,11 @@ import {
   rejectSuggestionCommand,
   acceptSuggestionCommand,
 } from "./commands.js";
-import { CodeiumConfig, codeiumConfig } from "./config.js";
+import {
+  CodeiumConfig,
+  codeiumConfig,
+  codeiumOtherDocumentsConfig,
+} from "./config.js";
 import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
 import { copilotIgnore } from "./annotations.js";
 
@@ -56,7 +60,7 @@ function viewCompletionPlugin() {
   });
 }
 
-export { Language, copilotIgnore };
+export { Language, copilotIgnore, codeiumConfig, codeiumOtherDocumentsConfig };
 
 export function copilotPlugin(config: CodeiumConfig): Extension {
   return [
