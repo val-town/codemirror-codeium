@@ -8,8 +8,8 @@ import {
   acceptSuggestionCommand,
 } from "./commands.js";
 import {
-  CodeiumConfig,
-  CodeiumOtherDocumentsConfig,
+  type CodeiumConfig,
+  type CodeiumOtherDocumentsConfig,
   codeiumConfig,
   codeiumOtherDocumentsConfig,
 } from "./config.js";
