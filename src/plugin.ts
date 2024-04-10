@@ -9,6 +9,7 @@ import {
 } from "./commands.js";
 import {
   CodeiumConfig,
+  CodeiumOtherDocumentsConfig,
   codeiumConfig,
   codeiumOtherDocumentsConfig,
 } from "./config.js";
@@ -60,7 +61,14 @@ function viewCompletionPlugin() {
   });
 }
 
-export { Language, copilotIgnore, codeiumConfig, codeiumOtherDocumentsConfig };
+export {
+  Language,
+  copilotIgnore,
+  codeiumConfig,
+  codeiumOtherDocumentsConfig,
+  CodeiumOtherDocumentsConfig,
+  CodeiumConfig,
+};
 
 export function copilotPlugin(config: CodeiumConfig): Extension {
   return [
