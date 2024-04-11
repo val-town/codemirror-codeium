@@ -34,8 +34,10 @@ export const codeiumConfig = Facet.define<
   },
 });
 
+type OtherDocuments = PartialMessage<Document>[];
+
 export interface CodeiumOtherDocumentsConfig {
-  otherDocuments?: PartialMessage<Document>[];
+  override?: () => Promise<OtherDocuments> | OtherDocuments;
 }
 
 export const codeiumOtherDocumentsConfig = Facet.define<
@@ -46,7 +48,7 @@ export const codeiumOtherDocumentsConfig = Facet.define<
     return combineConfig<Required<CodeiumOtherDocumentsConfig>>(
       configs,
       {
-        otherDocuments: [],
+        override: () => [],
       },
       {},
     );

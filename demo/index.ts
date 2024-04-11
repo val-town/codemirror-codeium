@@ -22,7 +22,7 @@ increment('not a number');`,
       jsx: true,
     }),
     codeiumOtherDocumentsConfig.of({
-      otherDocuments: [
+      override: () => [
         {
           absolutePath: "https://esm.town/v/foo.ts",
           text: `export const foo = 10;

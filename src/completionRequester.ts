@@ -61,9 +61,7 @@ export function completionRequester() {
 
   return EditorView.updateListener.of((update: ViewUpdate) => {
     const config = update.view.state.facet(codeiumConfig);
-    const { otherDocuments } = update.view.state.facet(
-      codeiumOtherDocumentsConfig,
-    );
+    const { override } = update.view.state.facet(codeiumOtherDocumentsConfig);
 
     if (!shouldRequestCompletion(update)) return;
 
@@ -85,6 +83,8 @@ export function completionRequester() {
     timeout = setTimeout(async () => {
       // Check if the position has changed
       if (pos !== lastPos) return;
+
+      const otherDocuments = await override();
 
       // Request completion from the server
       try {
