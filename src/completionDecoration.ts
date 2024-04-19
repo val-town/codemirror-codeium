@@ -38,6 +38,17 @@ export const completionDecoration = StateField.define<CompletionState>({
       }
     }
 
+    if (state) {
+      // If we ever have a state that is being updated,
+      // map it through the new changes to avoid the potential
+      // of a mismatch between it and the new document and new
+      // document length
+      return {
+        decorations: state.decorations.map(transaction.changes),
+        reverseChangeSet: state.reverseChangeSet.map(transaction.changes),
+      };
+    }
+
     return state;
   },
   provide: (field) =>
