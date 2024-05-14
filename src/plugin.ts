@@ -16,7 +16,11 @@ import {
 import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
 import { copilotIgnore } from "./annotations.js";
 
-function isDecorationClicked(view: EditorView) {
+/**
+ * Clicking a completion accepts it. This figures out
+ * whether a given click event is within the completion's area.
+ */
+function isDecorationClicked(view: EditorView): boolean {
   let inRange = false;
   const head = view.state.selection.asSingle().ranges.at(0)?.head;
   const stateField = view.state.field(completionDecoration);
@@ -29,6 +33,15 @@ function isDecorationClicked(view: EditorView) {
   return false;
 }
 
+/**
+ * Handles the behavior in which if you have a completion like
+ *
+ * foo|bar
+ *
+ * (the cursor is at |) and you type an x, it rejects
+ * the completion because that isn't part of the suggested
+ * code.
+ */
 function completionPlugin() {
   return EditorView.domEventHandlers({
     keydown(event, view) {
@@ -53,6 +66,10 @@ function completionPlugin() {
   });
 }
 
+/**
+ * Changing the editor's focus - blurring it by clicking outside -
+ * rejects the suggestion
+ */
 function viewCompletionPlugin() {
   return EditorView.updateListener.of((update) => {
     if (update.focusChanged) {

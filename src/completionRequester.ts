@@ -1,4 +1,4 @@
-import { completionStatus } from "@codemirror/autocomplete";
+import { CompletionContext, completionStatus } from "@codemirror/autocomplete";
 import { ChangeSet, Transaction } from "@codemirror/state";
 import { EditorView, ViewUpdate } from "@codemirror/view";
 import {
@@ -77,6 +77,18 @@ export function completionRequester() {
     // Get the current position and source
     const state = update.state;
     const pos = state.selection.main.head;
+
+    // If we've configured a custom rule for when to show completions
+    // and that rule says no, don't offer completions.
+    if (
+      config.shouldComplete &&
+      !config.shouldComplete(
+        new CompletionContext(update.view.state, pos, false),
+      )
+    ) {
+      return;
+    }
+
     const source = state.doc.toString();
 
     // Set a new timeout to request completion
