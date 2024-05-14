@@ -35,6 +35,13 @@ const hiddenValue = "https://macwright.com/"`,
     }),
     copilotPlugin({
       apiKey: "d49954eb-cfba-4992-980f-d8fb37f0e942",
+      shouldComplete(context) {
+        if (context.tokenBefore(["String"])) {
+          return true;
+        }
+        let match = context.matchBefore(/(@(?:\w*))(?:[./](\w*))?/);
+        return !match;
+      },
     }),
   ],
   parent: document.querySelector("#editor")!,
