@@ -1,6 +1,6 @@
 import { CompletionContext, completionStatus } from "@codemirror/autocomplete";
 import { ChangeSet, Transaction } from "@codemirror/state";
-import { EditorView, ViewUpdate } from "@codemirror/view";
+import { EditorView, type ViewUpdate } from "@codemirror/view";
 import {
   simplifyCompletions,
   completionsToChangeSpec,

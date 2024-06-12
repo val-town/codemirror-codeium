@@ -1,5 +1,5 @@
-import { ChangeSet, StateEffect } from "@codemirror/state";
-import { Suggestion } from "./types.js";
+import { type ChangeSet, StateEffect } from "@codemirror/state";
+import type { Suggestion } from "./types.js";
 
 // Effects to tell StateEffect what to do with GhostText
 export const addSuggestions = StateEffect.define<{

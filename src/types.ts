@@ -1,5 +1,5 @@
-import { type ChangeSet } from "@codemirror/state";
-import { type DecorationSet } from "@codemirror/view";
+import type { ChangeSet } from "@codemirror/state";
+import type { DecorationSet } from "@codemirror/view";
 
 export interface Suggestion {
   text: string;

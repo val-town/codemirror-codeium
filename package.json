@@ -6,7 +6,7 @@
     "dev": "vite",
     "generate": "buf generate",
     "tsc": "tsc --noEmit",
-    "test": "echo pass",
+    "test": "biome lint",
     "test:watch": "vitest",
     "pages": "vite build",
     "build": "tsc --build",
@@ -27,10 +27,11 @@
     "@codemirror/view": "^6"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.8.1",
     "@bufbuild/buf": "^1.30.0",
     "@bufbuild/protobuf": "^1.8.0",
-    "@codemirror/lang-python": "^6.1.5",
     "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-python": "^6.1.5",
     "codemirror": "^6",
     "typescript": "^5.4.3",
     "vite": "^5.2.7"

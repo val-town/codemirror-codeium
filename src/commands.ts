@@ -1,5 +1,5 @@
 import { Transaction, EditorSelection } from "@codemirror/state";
-import { EditorView } from "@codemirror/view";
+import type { EditorView } from "@codemirror/view";
 import { copilotEvent, copilotIgnore } from "./annotations.js";
 import { completionDecoration } from "./completionDecoration.js";
 import { acceptSuggestion, clearSuggestion } from "./effects.js";
@@ -7,7 +7,7 @@ import { acceptSuggestion, clearSuggestion } from "./effects.js";
 export function acceptSuggestionCommand(view: EditorView) {
   // We delete the ghost text and insert the suggestion.
   // We also set the cursor to the end of the suggestion.
-  const stateField = view.state.field(completionDecoration)!;
+  const stateField = view.state.field(completionDecoration);
 
   if (!stateField) {
     return false;
@@ -49,7 +49,7 @@ export function acceptSuggestionCommand(view: EditorView) {
 
 export function rejectSuggestionCommand(view: EditorView) {
   // We delete the suggestion, then carry through with the original keypress
-  const stateField = view.state.field(completionDecoration)!;
+  const stateField = view.state.field(completionDecoration);
 
   if (!stateField) {
     return false;
@@ -82,7 +82,6 @@ export function sameKeyCommand(view: EditorView, key: string) {
 
   if (key === "Tab") {
     return acceptSuggestionCommand(view);
-  } else {
-    return rejectSuggestionCommand(view);
   }
+  return rejectSuggestionCommand(view);
 }
