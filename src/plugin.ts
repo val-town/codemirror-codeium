@@ -101,6 +101,7 @@ export {
   copilotIgnore,
   codeiumConfig,
   codeiumOtherDocumentsConfig,
+  nextSuggestionCommand,
   type CodeiumOtherDocumentsConfig,
   type CodeiumConfig,
 };

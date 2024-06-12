@@ -58,10 +58,7 @@ export function acceptSuggestionCommand(view: EditorView) {
 }
 
 /**
- * Rejecting a suggestion: this looks at the currently-shown suggestion
- * and reverses it, clears the suggestion, and makes sure
- * that we don't add that clearing transaction to history and we don't
- * trigger a new suggestion because of it.
+ * Cycle through suggested AI completed code.
  */
 export const nextSuggestionCommand: Command = (view: EditorView) => {
   const { state } = view;
