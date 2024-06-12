@@ -23,7 +23,7 @@ export class DefaultCycleWidget extends WidgetType {
     words.innerText = `${this.index + 1}/${this.total}`;
     const key = wrap.appendChild(document.createElement("button"));
     key.className = "cm-codeium-cycle-key";
-    key.innerText = "⌥-]";
+    key.innerText = "→ (Ctrl ])";
     key.dataset.action = "codeium-cycle";
     return wrap;
   }

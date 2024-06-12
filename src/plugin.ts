@@ -72,7 +72,6 @@ function completionPlugin() {
         nextSuggestionCommand(view);
         event.stopPropagation();
         event.preventDefault();
-        console.log("got click, doing it");
         return true;
       }
       if (isDecorationClicked(view)) {
@@ -89,7 +88,7 @@ function completionPlugin() {
 function nextCompletionPlugin() {
   return keymap.of([
     {
-      key: "Alt-]",
+      key: "Ctrl-]",
       run: nextSuggestionCommand,
     },
   ]);
