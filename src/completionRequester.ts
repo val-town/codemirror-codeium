@@ -128,18 +128,18 @@ export function completionRequester() {
         // check the end of the line with the end of the completion
         const changeSpecs = completionsToChangeSpec(completionResult);
 
-        const firstSpec = changeSpecs.at(0);
+        const index = 0;
+        const firstSpec = changeSpecs.at(index);
         if (!firstSpec) return;
-
         const insertChangeSet = ChangeSet.of(firstSpec, state.doc.length);
-
         const reverseChangeSet = insertChangeSet.invert(state.doc);
 
         update.view.dispatch({
           changes: insertChangeSet,
           effects: addSuggestions.of({
+            index,
             reverseChangeSet,
-            suggestions: firstSpec,
+            changeSpecs,
           }),
           annotations: [
             copilotIgnore.of(null),
