@@ -1,11 +1,7 @@
 import { CompletionContext, completionStatus } from "@codemirror/autocomplete";
 import { ChangeSet, Transaction } from "@codemirror/state";
 import { EditorView, type ViewUpdate } from "@codemirror/view";
-import {
-  simplifyCompletions,
-  completionsToChangeSpec,
-  getCodeiumCompletions,
-} from "./codeium.js";
+import { completionsToChangeSpec, getCodeiumCompletions } from "./codeium.js";
 import {
   acceptSuggestion,
   addSuggestions,
@@ -56,7 +52,7 @@ function shouldIgnoreUpdate(update: ViewUpdate) {
  * A view plugin that requests completions from the server after a delay
  */
 export function completionRequester() {
-  let timeout: any = null;
+  let timeout: number | null = null;
   let lastPos = 0;
 
   return EditorView.updateListener.of((update: ViewUpdate) => {
@@ -130,31 +126,20 @@ export function completionRequester() {
         // Dispatch an effect to add the suggestion
         // If the completion starts before the end of the line,
         // check the end of the line with the end of the completion
-        const insertChangeSet = ChangeSet.of(
-          completionsToChangeSpec(completionResult),
-          state.doc.length,
-        );
+        const changeSpecs = completionsToChangeSpec(completionResult);
+
+        const firstSpec = changeSpecs.at(0);
+        if (!firstSpec) return;
+
+        const insertChangeSet = ChangeSet.of(firstSpec, state.doc.length);
 
         const reverseChangeSet = insertChangeSet.invert(state.doc);
 
-        let combinedOffset = 0;
         update.view.dispatch({
           changes: insertChangeSet,
           effects: addSuggestions.of({
             reverseChangeSet,
-            suggestions: simplifyCompletions(completionResult).map((part) => {
-              try {
-                return {
-                  text: part.text,
-                  cursorPos: pos,
-                  startPos: combinedOffset + Number(part.offset),
-                  endPos:
-                    combinedOffset + Number(part.offset) + part.text.length,
-                };
-              } finally {
-                combinedOffset += part.text.length;
-              }
-            }),
+            suggestions: firstSpec,
           }),
           annotations: [
             copilotIgnore.of(null),

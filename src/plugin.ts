@@ -85,6 +85,10 @@ export {
   type CodeiumConfig,
 };
 
+/**
+ * A combination of configuration, the keymap, the
+ * requester - as a composite extension for simplicity.
+ */
 export function copilotPlugin(config: CodeiumConfig): Extension {
   return [
     codeiumConfig.of(config),
