@@ -26,11 +26,13 @@ export const completionDecoration = StateField.define<CompletionState>({
   update(state: CompletionState, transaction: Transaction) {
     for (const effect of transaction.effects) {
       if (effect.is(addSuggestions)) {
+        const { changeSpecs, index } = effect.value;
+
         // NOTE: here we're adjusting the decoration range
         // to refer to locations in the document _after_ we've
         // inserted the text.
         const decorations = Decoration.set(
-          effect.value.suggestions.map((suggestionRange) => {
+          changeSpecs[index]!.map((suggestionRange) => {
             const range = ghostMark.range(
               suggestionRange.absoluteStartPos,
               suggestionRange.absoluteEndPos,
@@ -39,9 +41,10 @@ export const completionDecoration = StateField.define<CompletionState>({
           }),
         );
 
-        // TODO
         return {
+          index,
           decorations,
+          changeSpecs,
           reverseChangeSet: effect.value.reverseChangeSet,
         };
       }
@@ -59,6 +62,7 @@ export const completionDecoration = StateField.define<CompletionState>({
       // of a mismatch between it and the new document and new
       // document length
       return {
+        ...state,
         decorations: state.decorations.map(transaction.changes),
         reverseChangeSet: state.reverseChangeSet.map(transaction.changes),
       };

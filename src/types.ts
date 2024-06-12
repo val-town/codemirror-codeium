@@ -1,9 +1,21 @@
 import type { ChangeSet } from "@codemirror/state";
 import type { DecorationSet } from "@codemirror/view";
 
+/**
+ * We dispatch an effect that updates the CompletionState.
+ * CompletionState is null if no completions are displayed.
+ */
 export type CompletionState = null | {
+  index: number;
   reverseChangeSet: ChangeSet;
+  changeSpecs: SimpleChangeSpec[][];
   decorations: DecorationSet;
+};
+
+export type AddSuggestionsState = {
+  reverseChangeSet: ChangeSet;
+  changeSpecs: SimpleChangeSpec[][];
+  index: number;
 };
 
 export interface GhostText {
