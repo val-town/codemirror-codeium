@@ -1,5 +1,5 @@
-import type { ChangeSet } from "@codemirror/state";
-import type { DecorationSet } from "@codemirror/view";
+import type { Range, ChangeSet } from "@codemirror/state";
+import type { Decoration, DecorationSet } from "@codemirror/view";
 
 /**
  * We dispatch an effect that updates the CompletionState.

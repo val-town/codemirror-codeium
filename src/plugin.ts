@@ -63,7 +63,18 @@ function completionPlugin() {
       }
       return false;
     },
-    mouseup(_event, view) {
+    mouseup(event, view) {
+      const target = event.target as HTMLElement;
+      if (
+        target.nodeName === "BUTTON" &&
+        target.dataset.action === "codeium-cycle"
+      ) {
+        nextSuggestionCommand(view);
+        event.stopPropagation();
+        event.preventDefault();
+        console.log("got click, doing it");
+        return true;
+      }
       if (isDecorationClicked(view)) {
         return acceptSuggestionCommand(view);
       }
@@ -78,7 +89,7 @@ function completionPlugin() {
 function nextCompletionPlugin() {
   return keymap.of([
     {
-      key: "Ctrl-]",
+      key: "Alt-]",
       run: nextSuggestionCommand,
     },
   ]);

@@ -3,6 +3,7 @@ import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js
 import type { Document } from "./api/proto/exa/language_server_pb/language_server_pb.js";
 import type { PartialMessage } from "@bufbuild/protobuf";
 import type { CompletionContext } from "@codemirror/autocomplete";
+import { DefaultCycleWidget } from "./defaultCycleWidget.js";
 
 export interface CodeiumConfig {
   /**
@@ -30,6 +31,12 @@ export interface CodeiumConfig {
    * autocomplete sources.
    */
   shouldComplete?: (context: CompletionContext) => boolean;
+
+  /**
+   * The class for the widget that is shown at the end a suggestion
+   * when there are multiple suggestions to cycle through.
+   */
+  widgetClass?: typeof DefaultCycleWidget | null;
 }
 
 export const codeiumConfig = Facet.define<
@@ -42,6 +49,7 @@ export const codeiumConfig = Facet.define<
       {
         language: Language.TYPESCRIPT,
         timeout: 150,
+        widgetClass: DefaultCycleWidget,
       },
       {},
     );
