@@ -10,6 +10,7 @@ import {
   clearSuggestion,
 } from "./effects.js";
 import type { CompletionState } from "./types.js";
+import { codeiumConfig } from "./config.js";
 
 const ghostMark = Decoration.mark({ class: "cm-ghostText" });
 
@@ -24,6 +25,7 @@ export const completionDecoration = StateField.define<CompletionState>({
     return null;
   },
   update(state: CompletionState, transaction: Transaction) {
+    const config = transaction.state.facet(codeiumConfig);
     for (const effect of transaction.effects) {
       if (effect.is(addSuggestions)) {
         const { changeSpecs, index } = effect.value;
@@ -31,15 +33,28 @@ export const completionDecoration = StateField.define<CompletionState>({
         // NOTE: here we're adjusting the decoration range
         // to refer to locations in the document _after_ we've
         // inserted the text.
-        const decorations = Decoration.set(
-          changeSpecs[index]!.map((suggestionRange) => {
-            const range = ghostMark.range(
-              suggestionRange.absoluteStartPos,
-              suggestionRange.absoluteEndPos,
-            );
-            return range;
-          }),
-        );
+        const ranges = changeSpecs[index]!.map((suggestionRange) => {
+          const range = ghostMark.range(
+            suggestionRange.absoluteStartPos,
+            suggestionRange.absoluteEndPos,
+          );
+          return range;
+        });
+        const widgetPos = ranges.at(-1)?.to;
+
+        const decorations = Decoration.set([
+          ...ranges,
+          ...(widgetPos !== undefined &&
+          changeSpecs.length > 1 &&
+          config.widgetClass
+            ? [
+                Decoration.widget({
+                  widget: new config.widgetClass(index, changeSpecs.length),
+                  side: 1,
+                }).range(widgetPos),
+              ]
+            : []),
+        ]);
 
         return {
           index,

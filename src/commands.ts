@@ -1,8 +1,12 @@
-import { Transaction, EditorSelection } from "@codemirror/state";
-import type { EditorView } from "@codemirror/view";
+import { Transaction, EditorSelection, ChangeSet } from "@codemirror/state";
+import type { Command, EditorView } from "@codemirror/view";
 import { copilotEvent, copilotIgnore } from "./annotations.js";
 import { completionDecoration } from "./completionDecoration.js";
-import { acceptSuggestion, clearSuggestion } from "./effects.js";
+import {
+  acceptSuggestion,
+  addSuggestions,
+  clearSuggestion,
+} from "./effects.js";
 
 /**
  * Accepting a suggestion: we remove the ghost text, which
@@ -52,6 +56,79 @@ export function acceptSuggestionCommand(view: EditorView) {
 
   return true;
 }
+
+/**
+ * Cycle through suggested AI completed code.
+ */
+export const nextSuggestionCommand: Command = (view: EditorView) => {
+  const { state } = view;
+  // We delete the suggestion, then carry through with the original keypress
+  const stateField = state.field(completionDecoration);
+
+  if (!stateField) {
+    return false;
+  }
+
+  const { changeSpecs } = stateField;
+
+  if (changeSpecs.length < 2) {
+    return false;
+  }
+
+  // Loop through next suggestion.
+  const index = (stateField.index + 1) % changeSpecs.length;
+  const nextSpec = changeSpecs.at(index);
+  if (!nextSpec) {
+    return false;
+  }
+
+  /**
+   * First, get the original document, by applying the stored
+   * reverse changeset against the currently-displayed document.
+   */
+  const originalDocument = stateField.reverseChangeSet.apply(state.doc);
+
+  /**
+   * Get the changeset that we will apply that will
+   *
+   * 1. Reverse the currently-displayed suggestion, to get us back to
+   *    the original document
+   * 2. Apply the next suggestion.
+   *
+   * It does both in the same changeset, so there is no flickering.
+   */
+  const reverseCurrentSuggestionAndApplyNext = ChangeSet.of(
+    stateField.reverseChangeSet,
+    state.doc.length,
+  ).compose(ChangeSet.of(nextSpec, originalDocument.length));
+
+  /**
+   * Generate the next changeset
+   */
+  const nextSet = ChangeSet.of(nextSpec, originalDocument.length);
+  const reverseChangeSet = nextSet.invert(originalDocument);
+
+  view.dispatch({
+    changes: reverseCurrentSuggestionAndApplyNext,
+    effects: addSuggestions.of({
+      index,
+      reverseChangeSet,
+      changeSpecs,
+    }),
+    annotations: [
+      // Tell upstream integrations to ignore this
+      // change.
+      copilotIgnore.of(null),
+      // Tell ourselves not to request a completion
+      // because of this change.
+      copilotEvent.of(null),
+      // Don't add this to history.
+      Transaction.addToHistory.of(false),
+    ],
+  });
+
+  return true;
+};
 
 /**
  * Rejecting a suggestion: this looks at the currently-shown suggestion

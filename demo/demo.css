@@ -54,3 +54,32 @@ main {
 .cm-ghostText:hover {
   background: #eee;
 }
+
+.cm-codeium-cycle {
+  font-size: 9px;
+  background-color: #eee;
+  padding: 2px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.cm-codeium-cycle-key {
+  font-size: 9px;
+  font-family: monospace;
+  display: inline-block;
+  padding: 2px;
+  border-radius: 2px;
+  border: none;
+  background-color: lightblue;
+  margin-left: 5px;
+}
+
+.cm-codeium-cycle-key:hover {
+  background-color: deepskyblue;
+}
+
+.cm-codeium-cycle-explanation {
+  font-family: monospace;
+  display: inline-block;
+  padding: 2px;
+}

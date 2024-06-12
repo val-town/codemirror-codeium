@@ -1,4 +1,4 @@
-import { EditorView, type ViewUpdate } from "@codemirror/view";
+import { EditorView, keymap, type ViewUpdate } from "@codemirror/view";
 import { type Extension, Prec } from "@codemirror/state";
 import { completionDecoration } from "./completionDecoration.js";
 import { completionRequester } from "./completionRequester.js";
@@ -6,6 +6,7 @@ import {
   sameKeyCommand,
   rejectSuggestionCommand,
   acceptSuggestionCommand,
+  nextSuggestionCommand,
 } from "./commands.js";
 import {
   type CodeiumConfig,
@@ -45,6 +46,13 @@ function isDecorationClicked(view: EditorView): boolean {
 function completionPlugin() {
   return EditorView.domEventHandlers({
     keydown(event, view) {
+      // Ideally, we handle infighting between
+      // the nextSuggestionCommand and this handler
+      // by using precedence, but I can't get that to work
+      // yet.
+      if (event.key === "]" && event.ctrlKey) {
+        return false;
+      }
       if (
         event.key !== "Shift" &&
         event.key !== "Control" &&
@@ -55,13 +63,35 @@ function completionPlugin() {
       }
       return false;
     },
-    mouseup(_event, view) {
+    mouseup(event, view) {
+      const target = event.target as HTMLElement;
+      if (
+        target.nodeName === "BUTTON" &&
+        target.dataset.action === "codeium-cycle"
+      ) {
+        nextSuggestionCommand(view);
+        event.stopPropagation();
+        event.preventDefault();
+        return true;
+      }
       if (isDecorationClicked(view)) {
         return acceptSuggestionCommand(view);
       }
       return rejectSuggestionCommand(view);
     },
   });
+}
+
+/**
+ * Next completion map
+ */
+function nextCompletionPlugin() {
+  return keymap.of([
+    {
+      key: "Ctrl-]",
+      run: nextSuggestionCommand,
+    },
+  ]);
 }
 
 /**
@@ -81,6 +111,7 @@ export {
   copilotIgnore,
   codeiumConfig,
   codeiumOtherDocumentsConfig,
+  nextSuggestionCommand,
   type CodeiumOtherDocumentsConfig,
   type CodeiumConfig,
 };
@@ -93,8 +124,9 @@ export function copilotPlugin(config: CodeiumConfig): Extension {
   return [
     codeiumConfig.of(config),
     completionDecoration,
-    Prec.highest(completionPlugin()),
+    Prec.highest(nextCompletionPlugin()),
     Prec.highest(viewCompletionPlugin()),
+    Prec.high(completionPlugin()),
     completionRequester(),
   ];
 }
