@@ -1,6 +1,6 @@
 {
   "name": "@valtown/codemirror-codeium",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "codemirror integration for codeium",
   "scripts": {
     "dev": "vite",
