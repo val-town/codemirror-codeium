@@ -3,6 +3,9 @@
   "organizeImports": {
     "enabled": true
   },
+  "formatter": {
+    "indentStyle": "space"
+  },
   "files": {
     "ignore": ["dist/*"]
   },
