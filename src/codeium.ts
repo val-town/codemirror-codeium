@@ -6,8 +6,8 @@ import type {
   GetCompletionsResponse,
 } from "./api/proto/exa/language_server_pb/language_server_pb.js";
 import type { CodeiumConfig } from "./config.js";
-import type { ChangeSpec } from "@codemirror/state";
 import type { PartialMessage } from "@bufbuild/protobuf";
+import type { SimpleChangeSpec } from "./types.js";
 
 // This is the same as the monaco editor example
 const transport = createConnectTransport({
@@ -79,26 +79,33 @@ export async function getCodeiumCompletions({
  * be used with CodeMirror directly, and avoid using some
  * complex kinds of completions.
  */
-export function simplifyCompletions(completions: GetCompletionsResponse) {
-  return completions.completionItems[0]!.completionParts.filter((part) => {
-    // Type 3 overwrites existing text. Maybe we need this eventually,
-    // but not right now and it usually is duplicative.
-    return part.type !== 3;
-  }).map((part) => {
-    return {
-      ...part,
-      offset: Number(part.offset),
-      text: part.type === 2 ? `\n${part.text}` : part.text,
-    };
-  });
-}
-
 export function completionsToChangeSpec(
   completions: GetCompletionsResponse,
-): ChangeSpec[] {
-  return simplifyCompletions(completions).map((part) => ({
-    from: Number(part.offset),
-    to: Number(part.offset),
-    insert: part.text,
-  }));
+): SimpleChangeSpec[][] {
+  return completions.completionItems.map((item) => {
+    /**
+     * Add absolute offsets for the suggestion text insertions
+     * so that we can add matching decorations.
+     */
+    let combinedOffset = 0;
+    return item.completionParts
+      .filter((part) => {
+        // Type 3 overwrites existing text. Maybe we need this eventually,
+        // but not right now and it usually is duplicative.
+        return part.type !== 3;
+      })
+      .map((part): SimpleChangeSpec => {
+        const offset = Number(part.offset);
+        const text = part.type === 2 ? `\n${part.text}` : part.text;
+        const res: SimpleChangeSpec = {
+          absoluteStartPos: combinedOffset + offset,
+          absoluteEndPos: combinedOffset + offset + text.length,
+          from: offset,
+          to: offset,
+          insert: text,
+        };
+        combinedOffset += text.length;
+        return res;
+      });
+  });
 }

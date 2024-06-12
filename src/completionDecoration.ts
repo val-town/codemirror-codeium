@@ -13,6 +13,12 @@ import type { CompletionState } from "./types.js";
 
 const ghostMark = Decoration.mark({ class: "cm-ghostText" });
 
+/**
+ * Note that the completion _text_ is not actually a decoration!
+ * The text is very real, and actually inserted into the editor.
+ * The completion decoration is just a decoration that matches
+ * the same range as the completion text, and changes how it looks.
+ */
 export const completionDecoration = StateField.define<CompletionState>({
   create(_state: EditorState) {
     return null;
@@ -24,10 +30,10 @@ export const completionDecoration = StateField.define<CompletionState>({
         // to refer to locations in the document _after_ we've
         // inserted the text.
         const decorations = Decoration.set(
-          effect.value.suggestions.map((suggestion) => {
+          effect.value.suggestions.map((suggestionRange) => {
             const range = ghostMark.range(
-              suggestion.startPos,
-              suggestion.endPos,
+              suggestionRange.absoluteStartPos,
+              suggestionRange.absoluteEndPos,
             );
             return range;
           }),

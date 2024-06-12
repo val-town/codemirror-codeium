@@ -1,13 +1,6 @@
 import type { ChangeSet } from "@codemirror/state";
 import type { DecorationSet } from "@codemirror/view";
 
-export interface Suggestion {
-  text: string;
-  cursorPos: number;
-  startPos: number;
-  endPos: number;
-}
-
 export type CompletionState = null | {
   reverseChangeSet: ChangeSet;
   decorations: DecorationSet;
@@ -21,3 +14,16 @@ export interface GhostText {
   endPos: number;
   decorations: DecorationSet;
 }
+
+/**
+ * This is one of the variants of a ChangeSpec,
+ * plus the absoluteStartPos and absoluteEndPos
+ * properties.
+ */
+export type SimpleChangeSpec = {
+  absoluteStartPos: number;
+  absoluteEndPos: number;
+  from: number;
+  to: number;
+  insert: string;
+};

@@ -4,6 +4,12 @@ import { copilotEvent, copilotIgnore } from "./annotations.js";
 import { completionDecoration } from "./completionDecoration.js";
 import { acceptSuggestion, clearSuggestion } from "./effects.js";
 
+/**
+ * Accepting a suggestion: we remove the ghost text, which
+ * was not part of CodeMirror history, and then re-add it,
+ * making sure that it _is_ added to history, and we remove
+ * the Decoration that was making that ghost text look ghostly.
+ */
 export function acceptSuggestionCommand(view: EditorView) {
   // We delete the ghost text and insert the suggestion.
   // We also set the cursor to the end of the suggestion.
@@ -47,6 +53,12 @@ export function acceptSuggestionCommand(view: EditorView) {
   return true;
 }
 
+/**
+ * Rejecting a suggestion: this looks at the currently-shown suggestion
+ * and reverses it, clears the suggestion, and makes sure
+ * that we don't add that clearing transaction to history and we don't
+ * trigger a new suggestion because of it.
+ */
 export function rejectSuggestionCommand(view: EditorView) {
   // We delete the suggestion, then carry through with the original keypress
   const stateField = view.state.field(completionDecoration);
