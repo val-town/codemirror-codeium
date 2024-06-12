@@ -1,13 +1,13 @@
 import { createPromiseClient } from "@connectrpc/connect";
 import { LanguageServerService } from "./api/proto/exa/language_server_pb/language_server_connect.js";
 import { createConnectTransport } from "@connectrpc/connect-web";
-import {
+import type {
   Document,
   GetCompletionsResponse,
 } from "./api/proto/exa/language_server_pb/language_server_pb.js";
-import { CodeiumConfig } from "./config.js";
-import { ChangeSpec } from "@codemirror/state";
-import { type PartialMessage } from "@bufbuild/protobuf";
+import type { CodeiumConfig } from "./config.js";
+import type { ChangeSpec } from "@codemirror/state";
+import type { PartialMessage } from "@bufbuild/protobuf";
 
 // This is the same as the monaco editor example
 const transport = createConnectTransport({
@@ -17,6 +17,11 @@ const transport = createConnectTransport({
 
 const client = createPromiseClient(LanguageServerService, transport);
 
+/**
+ * Note that this won't be available in 'insecure contexts',
+ * websites served under HTTP not HTTPS, but those are rare.
+ * And it'll work in localhost for development.
+ */
 const sessionId = crypto.randomUUID();
 
 export async function getCodeiumCompletions({
@@ -68,6 +73,12 @@ export async function getCodeiumCompletions({
   )) as GetCompletionsResponse;
 }
 
+/**
+ * Make the body of the response a bit easier to work with:
+ * turn a BigInt into an int in the response so that it can
+ * be used with CodeMirror directly, and avoid using some
+ * complex kinds of completions.
+ */
 export function simplifyCompletions(completions: GetCompletionsResponse) {
   return completions.completionItems[0]!.completionParts.filter((part) => {
     // Type 3 overwrites existing text. Maybe we need this eventually,

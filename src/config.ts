@@ -1,8 +1,8 @@
 import { Facet, combineConfig } from "@codemirror/state";
 import { Language } from "./api/proto/exa/codeium_common_pb/codeium_common_pb.js";
-import { Document } from "./api/proto/exa/language_server_pb/language_server_pb.js";
-import { type PartialMessage } from "@bufbuild/protobuf";
-import { type CompletionContext } from "@codemirror/autocomplete";
+import type { Document } from "./api/proto/exa/language_server_pb/language_server_pb.js";
+import type { PartialMessage } from "@bufbuild/protobuf";
+import type { CompletionContext } from "@codemirror/autocomplete";
 
 export interface CodeiumConfig {
   /**

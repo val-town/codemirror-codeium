@@ -1,5 +1,5 @@
-import { EditorView, ViewUpdate } from "@codemirror/view";
-import { Extension, Prec } from "@codemirror/state";
+import { EditorView, type ViewUpdate } from "@codemirror/view";
+import { type Extension, Prec } from "@codemirror/state";
 import { completionDecoration } from "./completionDecoration.js";
 import { completionRequester } from "./completionRequester.js";
 import {
@@ -52,16 +52,14 @@ function completionPlugin() {
         event.key !== "Meta"
       ) {
         return sameKeyCommand(view, event.key);
-      } else {
-        return false;
       }
+      return false;
     },
     mouseup(_event, view) {
       if (isDecorationClicked(view)) {
         return acceptSuggestionCommand(view);
-      } else {
-        return rejectSuggestionCommand(view);
       }
+      return rejectSuggestionCommand(view);
     },
   });
 }
@@ -83,8 +81,8 @@ export {
   copilotIgnore,
   codeiumConfig,
   codeiumOtherDocumentsConfig,
-  CodeiumOtherDocumentsConfig,
-  CodeiumConfig,
+  type CodeiumOtherDocumentsConfig,
+  type CodeiumConfig,
 };
 
 export function copilotPlugin(config: CodeiumConfig): Extension {

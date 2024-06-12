@@ -39,7 +39,7 @@ const hiddenValue = "https://macwright.com/"`,
         if (context.tokenBefore(["String"])) {
           return true;
         }
-        let match = context.matchBefore(/(@(?:\w*))(?:[./](\w*))?/);
+        const match = context.matchBefore(/(@(?:\w*))(?:[./](\w*))?/);
         return !match;
       },
     }),
@@ -48,7 +48,7 @@ const hiddenValue = "https://macwright.com/"`,
 });
 
 new EditorView({
-  doc: `def hi_python():`,
+  doc: "def hi_python():",
   extensions: [
     basicSetup,
     python(),

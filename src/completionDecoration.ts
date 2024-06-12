@@ -1,11 +1,15 @@
-import { StateField, EditorState, Transaction } from "@codemirror/state";
+import {
+  StateField,
+  type EditorState,
+  type Transaction,
+} from "@codemirror/state";
 import { Decoration, EditorView } from "@codemirror/view";
 import {
   addSuggestions,
   acceptSuggestion,
   clearSuggestion,
 } from "./effects.js";
-import { CompletionState } from "./types.js";
+import type { CompletionState } from "./types.js";
 
 const ghostMark = Decoration.mark({ class: "cm-ghostText" });
 
@@ -21,7 +25,10 @@ export const completionDecoration = StateField.define<CompletionState>({
         // inserted the text.
         const decorations = Decoration.set(
           effect.value.suggestions.map((suggestion) => {
-            let range = ghostMark.range(suggestion.startPos, suggestion.endPos);
+            const range = ghostMark.range(
+              suggestion.startPos,
+              suggestion.endPos,
+            );
             return range;
           }),
         );
@@ -31,9 +38,11 @@ export const completionDecoration = StateField.define<CompletionState>({
           decorations,
           reverseChangeSet: effect.value.reverseChangeSet,
         };
-      } else if (effect.is(acceptSuggestion)) {
+      }
+      if (effect.is(acceptSuggestion)) {
         return null;
-      } else if (effect.is(clearSuggestion)) {
+      }
+      if (effect.is(clearSuggestion)) {
         return null;
       }
     }
