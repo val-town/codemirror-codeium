@@ -26,7 +26,7 @@ export const completionDecoration = StateField.define<CompletionState>({
   update(state: CompletionState, transaction: Transaction) {
     for (const effect of transaction.effects) {
       if (effect.is(addSuggestions)) {
-        const { changeSpecs, index } = effect.value;
+        const { changeSpecs, index, originalDocument } = effect.value;
 
         // NOTE: here we're adjusting the decoration range
         // to refer to locations in the document _after_ we've
@@ -45,6 +45,7 @@ export const completionDecoration = StateField.define<CompletionState>({
           index,
           decorations,
           changeSpecs,
+          originalDocument,
           reverseChangeSet: effect.value.reverseChangeSet,
         };
       }

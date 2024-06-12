@@ -1,4 +1,4 @@
-import type { ChangeSet } from "@codemirror/state";
+import type { ChangeSet, Text } from "@codemirror/state";
 import type { DecorationSet } from "@codemirror/view";
 
 /**
@@ -7,6 +7,7 @@ import type { DecorationSet } from "@codemirror/view";
  */
 export type CompletionState = null | {
   index: number;
+  originalDocument: Text;
   reverseChangeSet: ChangeSet;
   changeSpecs: SimpleChangeSpec[][];
   decorations: DecorationSet;
