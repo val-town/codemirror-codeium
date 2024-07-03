@@ -17,12 +17,24 @@ const transport = createConnectTransport({
 
 const client = createPromiseClient(LanguageServerService, transport);
 
-/**
- * Note that this won't be available in 'insecure contexts',
- * websites served under HTTP not HTTPS, but those are rare.
- * And it'll work in localhost for development.
- */
-const sessionId = crypto.randomUUID();
+let sessionId: string;
+try {
+  /**
+   * Note that this won't be available in 'insecure contexts',
+   * websites served under HTTP not HTTPS, but those are rare.
+   * And it'll work in localhost for development.
+   */
+  sessionId = crypto.randomUUID();
+} catch {
+  // When not in a secure context
+  // https://stackoverflow.com/questions/105034/how-do-i-create-a-guid-uuid
+  function uuidv4() {
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c =>
+      (+c ^ (crypto.getRandomValues(new Uint8Array(1))[0] ?? 0) & 15 >> +c / 4).toString(16)
+    );
+  }
+  sessionId = uuidv4();
+}
 
 export async function getCodeiumCompletions({
   text,
