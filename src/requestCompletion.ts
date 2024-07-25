@@ -73,7 +73,7 @@ export async function requestCompletion(view: EditorView, lastPos?: number) {
     });
   } catch (error) {
     console.warn("copilot completion failed", error);
-    // Javascript wait for 500ms for some reason is necessary here.
+    // Javascript wait for 300ms for some reason is necessary here.
     // TODO - FIGURE OUT WHY THIS RESOLVES THE BUG
 
     await new Promise((resolve) => setTimeout(resolve, 300));
