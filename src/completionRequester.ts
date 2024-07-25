@@ -48,14 +48,18 @@ function shouldIgnoreUpdate(update: ViewUpdate) {
   }
 }
 
-async function requestCompletion(update: ViewUpdate, lastPos?: number) {
-  const config = update.view.state.facet(codeiumConfig);
-  const { override } = update.view.state.facet(codeiumOtherDocumentsConfig);
+/**
+ * Inner 'requestCompletion' API, which can optionally
+ * be run all the time if you set `alwaysOn`
+ */
+export async function requestCompletion(view: EditorView, lastPos?: number) {
+  const config = view.state.facet(codeiumConfig);
+  const { override } = view.state.facet(codeiumOtherDocumentsConfig);
 
   const otherDocuments = await override();
 
   // Get the current position and source
-  const state = update.state;
+  const state = view.state;
   const pos = state.selection.main.head;
   const source = state.doc.toString();
 
@@ -78,8 +82,8 @@ async function requestCompletion(update: ViewUpdate, lastPos?: number) {
     if (
       !(
         (lastPos === undefined || pos === lastPos) &&
-        completionStatus(update.view.state) !== "active" &&
-        update.view.hasFocus
+        completionStatus(view.state) !== "active" &&
+        view.hasFocus
       )
     ) {
       return;
@@ -96,7 +100,7 @@ async function requestCompletion(update: ViewUpdate, lastPos?: number) {
     const insertChangeSet = ChangeSet.of(firstSpec, state.doc.length);
     const reverseChangeSet = insertChangeSet.invert(state.doc);
 
-    update.view.dispatch({
+    view.dispatch({
       changes: insertChangeSet,
       effects: addSuggestions.of({
         index,
@@ -160,7 +164,7 @@ export function completionRequester() {
       // Check if the position has changed
       if (pos !== lastPos) return;
 
-      await requestCompletion(update, lastPos);
+      await requestCompletion(update.view, lastPos);
     }, config.timeout);
 
     // Update the last position
