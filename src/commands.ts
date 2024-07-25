@@ -7,6 +7,7 @@ import {
   addSuggestions,
   clearSuggestion,
 } from "./effects.js";
+import { requestCompletion } from "./requestCompletion.js";
 
 /**
  * Accepting a suggestion: we remove the ghost text, which
@@ -174,3 +175,8 @@ export function sameKeyCommand(view: EditorView, key: string) {
   }
   return rejectSuggestionCommand(view);
 }
+
+export const startCompletion: Command = (view: EditorView) => {
+  requestCompletion(view);
+  return true;
+};
