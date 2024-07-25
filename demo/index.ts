@@ -2,12 +2,12 @@ import { EditorView, basicSetup } from "codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import {
   codeiumOtherDocumentsConfig,
+  startCompletion,
   Language,
   copilotPlugin,
 } from "../src/plugin.js";
 import { python } from "@codemirror/lang-python";
 import { keymap } from "@codemirror/view";
-import { startCompletion } from "../src/commands.js";
 
 new EditorView({
   doc: "// Factorial function",

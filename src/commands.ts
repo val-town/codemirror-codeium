@@ -7,7 +7,7 @@ import {
   addSuggestions,
   clearSuggestion,
 } from "./effects.js";
-import { requestCompletion } from "./completionRequester.js";
+import { requestCompletion } from "./requestCompletion.js";
 
 /**
  * Accepting a suggestion: we remove the ghost text, which

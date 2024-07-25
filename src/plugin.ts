@@ -7,6 +7,7 @@ import {
   rejectSuggestionCommand,
   acceptSuggestionCommand,
   nextSuggestionCommand,
+  startCompletion,
 } from "./commands.js";
 import {
   type CodeiumConfig,
@@ -112,6 +113,7 @@ export {
   codeiumConfig,
   codeiumOtherDocumentsConfig,
   nextSuggestionCommand,
+  startCompletion,
   type CodeiumOtherDocumentsConfig,
   type CodeiumConfig,
 };
