@@ -37,6 +37,11 @@ export interface CodeiumConfig {
    * when there are multiple suggestions to cycle through.
    */
   widgetClass?: typeof DefaultCycleWidget | null;
+
+  /**
+   * Always request completions after a delay
+   */
+  alwaysOn?: boolean;
 }
 
 export const codeiumConfig = Facet.define<
@@ -50,6 +55,7 @@ export const codeiumConfig = Facet.define<
         language: Language.TYPESCRIPT,
         timeout: 150,
         widgetClass: DefaultCycleWidget,
+        alwaysOn: true,
       },
       {},
     );

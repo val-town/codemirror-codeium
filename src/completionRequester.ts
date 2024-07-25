@@ -48,6 +48,76 @@ function shouldIgnoreUpdate(update: ViewUpdate) {
   }
 }
 
+async function requestCompletion(update: ViewUpdate, lastPos?: number) {
+  const config = update.view.state.facet(codeiumConfig);
+  const { override } = update.view.state.facet(codeiumOtherDocumentsConfig);
+
+  const otherDocuments = await override();
+
+  // Get the current position and source
+  const state = update.state;
+  const pos = state.selection.main.head;
+  const source = state.doc.toString();
+
+  // Request completion from the server
+  try {
+    const completionResult = await getCodeiumCompletions({
+      text: source,
+      cursorOffset: pos,
+      config,
+      otherDocuments,
+    });
+
+    if (!completionResult || completionResult.completionItems.length === 0) {
+      return;
+    }
+
+    // Check if the position is still the same. If
+    // it has changed, ignore the code that we just
+    // got from the API and don't show anything.
+    if (
+      !(
+        (lastPos === undefined || pos === lastPos) &&
+        completionStatus(update.view.state) !== "active" &&
+        update.view.hasFocus
+      )
+    ) {
+      return;
+    }
+
+    // Dispatch an effect to add the suggestion
+    // If the completion starts before the end of the line,
+    // check the end of the line with the end of the completion
+    const changeSpecs = completionsToChangeSpec(completionResult);
+
+    const index = 0;
+    const firstSpec = changeSpecs.at(index);
+    if (!firstSpec) return;
+    const insertChangeSet = ChangeSet.of(firstSpec, state.doc.length);
+    const reverseChangeSet = insertChangeSet.invert(state.doc);
+
+    update.view.dispatch({
+      changes: insertChangeSet,
+      effects: addSuggestions.of({
+        index,
+        reverseChangeSet,
+        changeSpecs,
+      }),
+      annotations: [
+        copilotIgnore.of(null),
+        copilotEvent.of(null),
+        Transaction.addToHistory.of(false),
+      ],
+    });
+  } catch (error) {
+    console.warn("copilot completion failed", error);
+    // Javascript wait for 500ms for some reason is necessary here.
+    // TODO - FIGURE OUT WHY THIS RESOLVES THE BUG
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
+}
+
 /**
  * A view plugin that requests completions from the server after a delay
  */
@@ -57,7 +127,7 @@ export function completionRequester() {
 
   return EditorView.updateListener.of((update: ViewUpdate) => {
     const config = update.view.state.facet(codeiumConfig);
-    const { override } = update.view.state.facet(codeiumOtherDocumentsConfig);
+    if (!config.alwaysOn) return;
 
     if (!shouldRequestCompletion(update)) return;
 
@@ -85,76 +155,14 @@ export function completionRequester() {
       return;
     }
 
-    const source = state.doc.toString();
-
     // Set a new timeout to request completion
     timeout = setTimeout(async () => {
       // Check if the position has changed
       if (pos !== lastPos) return;
 
-      const otherDocuments = await override();
-
-      // Request completion from the server
-      try {
-        const completionResult = await getCodeiumCompletions({
-          text: source,
-          cursorOffset: pos,
-          config,
-          otherDocuments,
-        });
-
-        if (
-          !completionResult ||
-          completionResult.completionItems.length === 0
-        ) {
-          return;
-        }
-
-        // Check if the position is still the same. If
-        // it has changed, ignore the code that we just
-        // got from the API and don't show anything.
-        if (
-          !(
-            pos === lastPos &&
-            completionStatus(update.view.state) !== "active" &&
-            update.view.hasFocus
-          )
-        ) {
-          return;
-        }
-
-        // Dispatch an effect to add the suggestion
-        // If the completion starts before the end of the line,
-        // check the end of the line with the end of the completion
-        const changeSpecs = completionsToChangeSpec(completionResult);
-
-        const index = 0;
-        const firstSpec = changeSpecs.at(index);
-        if (!firstSpec) return;
-        const insertChangeSet = ChangeSet.of(firstSpec, state.doc.length);
-        const reverseChangeSet = insertChangeSet.invert(state.doc);
-
-        update.view.dispatch({
-          changes: insertChangeSet,
-          effects: addSuggestions.of({
-            index,
-            reverseChangeSet,
-            changeSpecs,
-          }),
-          annotations: [
-            copilotIgnore.of(null),
-            copilotEvent.of(null),
-            Transaction.addToHistory.of(false),
-          ],
-        });
-      } catch (error) {
-        console.warn("copilot completion failed", error);
-        // Javascript wait for 500ms for some reason is necessary here.
-        // TODO - FIGURE OUT WHY THIS RESOLVES THE BUG
-
-        await new Promise((resolve) => setTimeout(resolve, 300));
-      }
+      await requestCompletion(update, lastPos);
     }, config.timeout);
+
     // Update the last position
     lastPos = pos;
   });
