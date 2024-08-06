@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.1",
-    "@bufbuild/buf": "^1.30.0",
+    "@bufbuild/buf": "^1.36.0",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lang-python": "^6.1.5",
     "codemirror": "^6",
@@ -43,7 +43,7 @@
     "node": "*"
   },
   "dependencies": {
-    "@bufbuild/protobuf": "^1.8.0",
+    "@bufbuild/protobuf": "^1.10.0",
     "@connectrpc/connect": "^1.4.0",
     "@connectrpc/connect-web": "^1.4.0"
   }
