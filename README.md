@@ -64,20 +64,19 @@ The entire process fires three separate transactions, each causing the document 
 You can still listen to doc updates but ignore when the Codieum events fire by doing something like this:
 ```js
 new EditorView({
-	extensions: [
-		EditorView.updateListener.of((v) => {
-			if (v.docChanged) {
-				for(let i = 0; i < v.transactions[0].annotations.length; i++) {
-					if(v.transactions[0].annotations[i].value === "aiSuggestion" || v.transactions[0].annotations[i].value === "aiRemoveGhost") {
-						return;
-					}
-				}
-		
-				// Use the current document state
-				console.log(v.state.doc.toString());
-			}
-		})
-	]
+  extensions: [
+    EditorView.updateListener.of((v) => {
+      if (v.docChanged) {
+        for(let i = 0; i < v.transactions[0].annotations.length; i++) {
+          if(v.transactions[0].annotations[i].value === "aiSuggestion" || v.transactions[0].annotations[i].value === "aiRemoveGhost") {
+            return;
+          }
+        }
+        // Use the current document state
+        console.log(v.state.doc.toString());
+      }
+    });
+  ]
 );
 ```
 
