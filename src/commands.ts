@@ -41,6 +41,8 @@ export function acceptSuggestionCommand(view: EditorView) {
       copilotEvent.of(null),
       // Don't add this to history.
       Transaction.addToHistory.of(false),
+      // Add userEvent label
+      Transaction.userEvent.of('aiRemoveGhost')
     ],
   });
 
@@ -52,7 +54,7 @@ export function acceptSuggestionCommand(view: EditorView) {
   view.dispatch({
     changes: reverseReverseChangeSet,
     selection: EditorSelection.cursor(lastIndex),
-    annotations: [copilotEvent.of(null), Transaction.addToHistory.of(true)],
+    annotations: [copilotEvent.of(null), Transaction.addToHistory.of(true), Transaction.userEvent.of('aiAccept')],
   });
 
   return true;
