@@ -51,6 +51,36 @@ text. You can add your own style for this class. The demo uses this style:
 }
 ```
 
+
+### Tracking Editor Updates
+
+Adding event listeners to the editor can be helpful if you want to implement features such as auto-save or live code rerendering.
+
+The entire process fires three separate transactions, each causing the document to update.
+1) It first adds a suggestion ghost to the editor view
+2) Then it removes the ghost suggestion, both before accepting it or declining it
+3) Accepting the suggestion and adding it to the doc.
+
+You can still listen to doc updates but ignore when the Codieum events fire by doing something like this:
+```
+new EditorView({
+	extensions: [
+		EditorView.updateListener.of((v) => {
+			if (v.docChanged) {
+				for(let i = 0; i < v.transactions[0].annotations.length; i++) {
+					if(v.transactions[0].annotations[i].value === "aiSuggestion" || v.transactions[0].annotations[i].value === "aiRemoveGhost") {
+						return;
+					}
+				}
+		
+				// Use the current document state
+				console.log(v.state.doc.toString());
+			}
+		})
+	]
+);
+```
+
 ### Architecture
 
 This makes requests against the [Codeium](https://codeium.com/) hosted product,
