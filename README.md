@@ -62,7 +62,7 @@ The entire process fires three separate transactions, each causing the document 
 3) Accepting the suggestion and adding it to the doc.
 
 You can still listen to doc updates but ignore when the Codieum events fire by doing something like this:
-```
+```js
 new EditorView({
 	extensions: [
 		EditorView.updateListener.of((v) => {
