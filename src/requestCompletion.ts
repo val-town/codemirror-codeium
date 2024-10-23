@@ -68,6 +68,7 @@ export async function requestCompletion(view: EditorView, lastPos?: number) {
       annotations: [
         copilotIgnore.of(null),
         copilotEvent.of(null),
+        Transation.userEvent.of('aiSuggestion'),
         Transaction.addToHistory.of(false),
       ],
     });
